@@ -125,65 +125,33 @@ public class Combat extends BaseContent {
 	public function healModBlack():Number {
 		return magic.healModBlackImpl();
 	}
+	//TODO @Oxdeception inline below
 	public function maxFistAttacks():int {
-		if (player.hasPerk(PerkLib.ComboMaster)) return 3;
-		else if (player.hasPerk(PerkLib.Combo)) return 2;
-		else return 1;
+		return player.maxFistAttacks();
 	}
 	public function maxClawsAttacks():int {
-		if (player.hasPerk(PerkLib.ClawingFlurry)) return 5;
-		else if (player.hasPerk(PerkLib.MultiClawAttack)) return 4;
-		else if (player.hasPerk(PerkLib.ExtraClawAttack)) return 3;
-		else if (player.hasPerk(PerkLib.ClawTraining)) return 2;
-		else return 1;
+		return player.maxClawsAttacks();
 	}
 	public function maxLargeAttacks():int {
-		if (player.hasPerk(PerkLib.TripleAttackLarge)) return 3;
-		else if (player.hasPerk(PerkLib.DoubleAttackLarge)) return 2;
-		else return 1;
+		return player.maxLargeAttacks();
 	}
 	public function maxCommonAttacks():int {
-		if (player.hasPerk(PerkLib.HexaAttack)) return 6;
-		else if (player.hasPerk(PerkLib.PentaAttack)) return 5;
-		else if (player.hasPerk(PerkLib.QuadrupleAttack)) return 4;
-		else if (player.hasPerk(PerkLib.TripleAttack)) return 3;
-		else if (player.hasPerk(PerkLib.DoubleAttack)) return 2;
-		else return 1;
+		return player.maxCommonAttacks();
 	}
 	public function maxCurrentAttacks():int {
-		if (player.weaponPerk == "Dual Large" || player.weaponPerk == "Dual" || player.weaponPerk == "Staff") return 1;
-		else if (player.weaponPerk == "Large") return maxLargeAttacks();
-		else if (flags[kFLAGS.FERAL_COMBAT_MODE] != 1 && player.isFistOrFistWeapon()) return maxFistAttacks();
-		else if (flags[kFLAGS.FERAL_COMBAT_MODE] == 1 && ((player.weaponName == "fists" && player.haveNaturalClaws()) || player.haveNaturalClawsTypeWeapon())) return maxClawsAttacks();
-		else return maxCommonAttacks();
+		return player.maxCurrentAttacks();
 	}
 	public function maxBowAttacks():int {
-		if (player.hasPerk(PerkLib.Multishot)) return 6;
-		else if (player.hasPerk(PerkLib.WildQuiver)) return 5;
-		else if (player.hasPerk(PerkLib.Manyshot)) return 4;
-		else if (player.hasPerk(PerkLib.TripleStrike)) return 3;
-		else if (player.hasPerk(PerkLib.DoubleStrike)) return 2;
-		else return 1;
+		return player.maxBowAttacks();
 	}
 	public function maxCrossbowAttacks():int {
-		if (player.hasPerk(PerkLib.TripleStrike)) return 3;
-		else if (player.hasPerk(PerkLib.DoubleStrike)) return 2;
-		else return 1;
+		return player.maxCrossbowAttacks();
 	}
 	public function maxThrowingAttacks():int {
-		if (player.hasPerk(PerkLib.TripleStrike)) return 3;
-		else if (player.hasPerk(PerkLib.DoubleStrike)) return 2;
-		else return 1;
+		return player.maxThrowingAttacks();
 	}
 	public function maxCurrentRangeAttacks():int {
-		if (player.weaponRangePerk == "Throwing") return maxThrowingAttacks();
-		else if (player.weaponRangePerk == "Crossbow") return maxCrossbowAttacks();
-		else if (player.weaponRangePerk == "Bow") return maxBowAttacks();
-		else return 1;
-	}
-	
-	public function PlayerHPRatio():Number{
-		return player.HP/player.maxHP();
+		return player.maxCurrentRangeAttacks();
 	}
 
 	public function endHpVictory():void
@@ -2925,7 +2893,7 @@ public function doDamage(damage:Number, apply:Boolean = true, display:Boolean = 
 	}
 	if (player.hasPerk(PerkLib.Anger) && (player.hasStatusEffect(StatusEffects.Berzerking) || player.hasStatusEffect(StatusEffects.Lustzerking))) {
 		var bonusDamageFromMissingHP:Number = 1;
-		if (PlayerHPRatio() < 1) bonusDamageFromMissingHP += 1 - PlayerHPRatio();
+		if (player.HPRatio() < 1) bonusDamageFromMissingHP += 1 - player.HPRatio();
 		damage *= bonusDamageFromMissingHP;
 	}
 	if (monster.hasStatusEffect(StatusEffects.DefendMonsterVer)) damage *= (1 - monster.statusEffectv2(StatusEffects.DefendMonsterVer));

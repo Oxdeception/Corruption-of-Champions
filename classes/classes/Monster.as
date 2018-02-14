@@ -27,9 +27,9 @@ import classes.internals.RandomDrop;
 import classes.internals.Utils;
 import classes.internals.WeightedDrop;
 
-import flash.utils.getQualifiedClassName;
+	import flash.utils.getQualifiedClassName;
 
-/**
+	/**
 	 * ...
 	 * @author Yoffy, Fake-Name, aimozg
 	 */
@@ -461,13 +461,6 @@ import flash.utils.getQualifiedClassName;
 				temp *= tempmulti;
 			}
 			return temp;
-		}
-
-		/**
-		 * @return HP/eMaxHP()
-		 */
-		public function HPRatio():Number{
-			return HP / maxHP();
 		}
 
 		/**

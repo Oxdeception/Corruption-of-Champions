@@ -1,41 +1,41 @@
 ﻿//CoC Creature.as
 package classes
 {
-import classes.BodyParts.Antennae;
-import classes.BodyParts.Arms;
-import classes.BodyParts.Beard;
-import classes.BodyParts.Butt;
-import classes.BodyParts.Claws;
-import classes.BodyParts.Ears;
-import classes.BodyParts.Eyes;
-import classes.BodyParts.Face;
-import classes.BodyParts.Gills;
-import classes.BodyParts.Hair;
-import classes.BodyParts.Hips;
-import classes.BodyParts.Horns;
-import classes.BodyParts.IOrifice;
-import classes.BodyParts.LowerBody;
-import classes.BodyParts.RearBody;
-import classes.BodyParts.Skin;
-import classes.BodyParts.Tail;
-import classes.BodyParts.Tongue;
-import classes.BodyParts.UnderBody;
-import classes.BodyParts.Wings;
-import classes.GlobalFlags.kFLAGS;
-import classes.Items.JewelryLib;
-import classes.Scenes.Places.TelAdre.UmasShop;
-import classes.StatusEffects.Combat.CombatInteBuff;
-import classes.StatusEffects.Combat.CombatSpeBuff;
-import classes.StatusEffects.Combat.CombatStrBuff;
-import classes.StatusEffects.Combat.CombatTouBuff;
-import classes.StatusEffects.Combat.CombatWisBuff;
-import classes.internals.Utils;
-import classes.lists.BreastCup;
-import classes.lists.Gender;
+	import classes.BodyParts.Antennae;
+	import classes.BodyParts.Arms;
+	import classes.BodyParts.Beard;
+	import classes.BodyParts.Butt;
+	import classes.BodyParts.Claws;
+	import classes.BodyParts.Ears;
+	import classes.BodyParts.Eyes;
+	import classes.BodyParts.Face;
+	import classes.BodyParts.Gills;
+	import classes.BodyParts.Hair;
+	import classes.BodyParts.Hips;
+	import classes.BodyParts.Horns;
+	import classes.BodyParts.IOrifice;
+	import classes.BodyParts.LowerBody;
+	import classes.BodyParts.RearBody;
+	import classes.BodyParts.Skin;
+	import classes.BodyParts.Tail;
+	import classes.BodyParts.Tongue;
+	import classes.BodyParts.UnderBody;
+	import classes.BodyParts.Wings;
+	import classes.GlobalFlags.kFLAGS;
+	import classes.Items.JewelryLib;
+	import classes.Scenes.Places.TelAdre.UmasShop;
+	import classes.StatusEffects.Combat.CombatInteBuff;
+	import classes.StatusEffects.Combat.CombatSpeBuff;
+	import classes.StatusEffects.Combat.CombatStrBuff;
+	import classes.StatusEffects.Combat.CombatTouBuff;
+	import classes.StatusEffects.Combat.CombatWisBuff;
+	import classes.internals.Utils;
+	import classes.lists.BreastCup;
+	import classes.lists.Gender;
 
-import flash.errors.IllegalOperationError;
+	import flash.errors.IllegalOperationError;
 
-public class Creature extends Utils
+	public class Creature extends Utils
 	{
 
 
@@ -3947,6 +3947,91 @@ public class Creature extends Utils
 				scale   : argDefs.scale[0],
 				max     : argDefs.max[0]
 			};
+		}
+
+		/**
+		 * @return HP/eMaxHP()
+		 */
+		public function HPRatio():Number
+		{
+			return HP / maxHP();
+		}
+
+		public function maxFistAttacks():int {
+			if (hasPerk(PerkLib.ComboMaster)) return 3;
+			if (hasPerk(PerkLib.Combo)) return 2;
+			return 1;
+		}
+		public function maxClawsAttacks():int {
+			if (hasPerk(PerkLib.ClawingFlurry)) return 5;
+			if (hasPerk(PerkLib.MultiClawAttack)) return 4;
+			if (hasPerk(PerkLib.ExtraClawAttack)) return 3;
+			if (hasPerk(PerkLib.ClawTraining)) return 2;
+			return 1;
+		}
+		public function maxLargeAttacks():int {
+			if (hasPerk(PerkLib.TripleAttackLarge)) return 3;
+			if (hasPerk(PerkLib.DoubleAttackLarge)) return 2;
+			return 1;
+		}
+		public function maxCommonAttacks():int {
+			if (hasPerk(PerkLib.HexaAttack)) return 6;
+			if (hasPerk(PerkLib.PentaAttack)) return 5;
+			if (hasPerk(PerkLib.QuadrupleAttack)) return 4;
+			if (hasPerk(PerkLib.TripleAttack)) return 3;
+			if (hasPerk(PerkLib.DoubleAttack)) return 2;
+			return 1;
+		}
+
+		public function maxCurrentAttacks():int
+		{
+			if (weaponPerk in ["Dual Large", "Dual", "Staff"]) return 1;
+			if (weaponPerk == "Large") return maxLargeAttacks();
+			if (isFistOrFistWeapon()) {
+				if (flags[kFLAGS.FERAL_COMBAT_MODE] != 1) {
+					return maxFistAttacks();
+				} else if (haveNaturalClaws() || haveNaturalClawsTypeWeapon()) {
+					return maxClawsAttacks();
+				}
+			}
+			return maxCommonAttacks();
+		}
+		public function maxBowAttacks():int {
+			if (hasPerk(PerkLib.Multishot)) return 6;
+			if (hasPerk(PerkLib.WildQuiver)) return 5;
+			if (hasPerk(PerkLib.Manyshot)) return 4;
+			if (hasPerk(PerkLib.TripleStrike)) return 3;
+			if (hasPerk(PerkLib.DoubleStrike)) return 2;
+			return 1;
+		}
+		public function maxCrossbowAttacks():int {
+			if (hasPerk(PerkLib.TripleStrike)) return 3;
+			if (hasPerk(PerkLib.DoubleStrike)) return 2;
+			return 1;
+		}
+		public function maxThrowingAttacks():int {
+			if (hasPerk(PerkLib.TripleStrike)) return 3;
+			if (hasPerk(PerkLib.DoubleStrike)) return 2;
+			return 1;
+		}
+		public function maxCurrentRangeAttacks():int {
+			switch(weaponRangePerk){
+				case "Throwing": return maxThrowingAttacks();
+				case "Crossbow": return maxCrossbowAttacks();
+				case "Bow": return maxBowAttacks();
+				default: return 1;
+			}
+		}
+		public function isFistOrFistWeapon():Boolean {
+			return weaponName == "fists";
+		}
+		public function haveNaturalClaws():Boolean
+		{
+			return arms.haveNaturalClaws();
+		}
+		public function haveNaturalClawsTypeWeapon():Boolean
+		{
+			return weaponName == "gauntlet with claws";
 		}
 	}
 }

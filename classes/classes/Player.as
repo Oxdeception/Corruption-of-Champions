@@ -468,16 +468,7 @@ use namespace CoC;
 		override public function get armorValue():Number {
 			return _armor.value;
 		}
-		//Natural Claws (arm types and weapons that can substitude them)
-		public function haveNaturalClaws():Boolean
-		{
-			return arms.type == Arms.CAT || arms.type == Arms.DEVIL || arms.type == Arms.DRAGON || arms.type == Arms.FOX || arms.type == Arms.GARGOYLE || arms.type == Arms.LION || arms.type == Arms.LIZARD || arms.type == Arms.RAIJU
-			       || arms.type == Arms.RED_PANDA || arms.type == Arms.SALAMANDER || arms.type == Arms.WOLF;
-		}
-		public function haveNaturalClawsTypeWeapon():Boolean
-		{
-			return weaponName == "gauntlet with claws";
-		}
+
 		//Weapons for Whirlwind
 		public function isWeaponForWhirlwind():Boolean
 		{
@@ -505,7 +496,7 @@ use namespace CoC;
 			return weapon == game.weapons.DBFSWO;
 		}
 		//Fists and fist weapons
-		public function isFistOrFistWeapon():Boolean
+		override public function isFistOrFistWeapon():Boolean
 		{
 			return weaponName == "fists" || weapon == game.weapons.S_GAUNT || weapon == game.weapons.H_GAUNT || weapon == game.weapons.MASTGLO || weapon == game.weapons.KARMTOU || weapon == game.weapons.YAMARG || weapon == game.weapons.CLAWS;
 		}

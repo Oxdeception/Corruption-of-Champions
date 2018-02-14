@@ -34,5 +34,12 @@ public class Arms extends BodyPart {
 	public function Arms() {
 		super(null, null);
 	}
+
+	private static const _hasNaturalClaws:Array = [
+		CAT,DEVIL,DRAGON,FOX,GARGOYLE,LION,LIZARD,RAIJU,RED_PANDA,SALAMANDER,WOLF
+	];
+	public function haveNaturalClaws():Boolean {
+		return (type in _hasNaturalClaws);
+	}
 }
 }
