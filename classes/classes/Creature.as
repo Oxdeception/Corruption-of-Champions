@@ -4025,6 +4025,7 @@ package classes
 		public function isFistOrFistWeapon():Boolean {
 			return weaponName == "fists";
 		}
+
 		public function haveNaturalClaws():Boolean
 		{
 			return arms.haveNaturalClaws();
@@ -4032,6 +4033,162 @@ package classes
 		public function haveNaturalClawsTypeWeapon():Boolean
 		{
 			return weaponName == "gauntlet with claws";
+		}
+
+		public function scalingBonusToughness():Number {
+			return touSpeStrScale(tou);
+		}
+
+		public function scalingBonusSpeed():Number {
+			return touSpeStrScale(spe);
+		}
+
+		public function scalingBonusStrength():Number {
+			return touSpeStrScale(str);
+		}
+
+		public function scalingBonusWisdom():Number {
+			return inteWisLibScale(wis);
+		}
+
+		public function scalingBonusIntelligence():Number {
+			return inteWisLibScale(inte);
+		}
+
+		public function scalingBonusLibido():Number {
+			return inteWisLibScale(lib);
+		}
+
+		protected function touSpeStrScale(stat:int):Number{
+			var scale:Number = 0;
+			for(var i:int = 20; (i <= 80) && (i <= stat); i += 20){
+				scale += stat - i;
+			}
+			for(i = 100; (i <= 1200) && (i <= stat); i += 50){
+				scale += stat - i;
+			}
+			return scale;
+		}
+
+		protected function inteWisLibScale(stat:int):Number {
+			var scale:Number = 6.75;
+			var changeBy:Number = 0.50;
+			if(stat <= 1200){
+				if(stat <= 100){
+					scale = (2/6) + ((int(stat/100)/20) * (1/6));
+					changeBy = 0.25;
+				} else {
+					scale = 1 + (int((stat - 100)/50) * 0.25);
+				}
+			}
+			return (stat * scale) + rand(stat * (scale + changeBy));
+		}
+
+		public function soulskillMod():Number {
+			var modss:Number = 1;
+			if (hasPerk(PerkLib.DaoistCultivator) && wis >= 20) modss += .1;
+			if (hasPerk(PerkLib.DaoistApprenticeStage)) {
+				if (hasPerk(PerkLib.SoulApprentice) && wis >= 30) modss += .2;
+				if (hasPerk(PerkLib.SoulPersonage) && wis >= 40) modss += .2;
+				if (hasPerk(PerkLib.SoulWarrior) && wis >= 50) modss += .2;
+			}
+			if (hasPerk(PerkLib.DaoistWarriorStage)) {
+				if (hasPerk(PerkLib.SoulSprite) && wis >= 60) modss += .3;
+				if (hasPerk(PerkLib.SoulScholar) && wis >= 70) modss += .3;
+				if (hasPerk(PerkLib.SoulElder) && wis >= 80) modss += .3;
+			}
+			if (hasPerk(PerkLib.DaoistElderStage)) {
+				if (hasPerk(PerkLib.SoulExalt) && wis >= 90) modss += .4;
+				if (hasPerk(PerkLib.SoulOverlord) && wis >= 100) modss += .4;
+				if (hasPerk(PerkLib.SoulTyrant) && wis >= 110) modss += .4;
+			}
+			if (hasPerk(PerkLib.DaoistOverlordStage)) {
+				if (hasPerk(PerkLib.SoulKing) && wis >= 120) modss += .5;
+				if (hasPerk(PerkLib.SoulEmperor) && wis >= 130) modss += .5;
+				if (hasPerk(PerkLib.SoulAncestor) && wis >= 140) modss += .5;
+			}
+			if (hasPerk(PerkLib.HclassHeavenTribulationSurvivor)) modss += .3;
+			if (hasPerk(PerkLib.GclassHeavenTribulationSurvivor)) modss += .4;
+//	        if (hasPerk(PerkLib.FclassHeavenTribulationSurvivor)) modss += .5;
+			if (hasPerk(PerkLib.DaoistsFocus)) modss += perkv1(PerkLib.DaoistsFocus);
+			if (hasPerk(PerkLib.WizardsAndDaoistsFocus)) modss += perkv2(PerkLib.WizardsAndDaoistsFocus);
+			if (hasPerk(PerkLib.SeersInsight)) modss += perkv1(PerkLib.SeersInsight);
+			if (hasPerk(PerkLib.AscensionSpiritualEnlightenment)) modss *= 1 + (perkv1(PerkLib.AscensionSpiritualEnlightenment) * 0.1);
+			if (shieldName == "spirit focus") modss += .2;
+			return modss;
+		}
+		public function soulskillPhysicalMod():Number {
+			var modssp:Number = 1;
+			if (hasPerk(PerkLib.HclassHeavenTribulationSurvivor)) modssp += .3;
+			if (hasPerk(PerkLib.GclassHeavenTribulationSurvivor)) modssp += .4;
+//	        if (hasPerk(PerkLib.FclassHeavenTribulationSurvivor)) modssp += .5;
+			if (hasPerk(PerkLib.BodyCultivatorsFocus)) modssp += perkv1(PerkLib.BodyCultivatorsFocus);
+			if (hasPerk(PerkLib.AscensionSpiritualEnlightenment)) modssp *= 1 + (perkv1(PerkLib.AscensionSpiritualEnlightenment) * 0.1);
+			return modssp;
+		}
+		public function soulskillMagicalMod():Number {
+			var modssm:Number = 1;
+			if (hasPerk(PerkLib.DaoistCultivator) && wis >= 20) modssm += .1;
+			if (hasPerk(PerkLib.DaoistApprenticeStage)) {
+				if (hasPerk(PerkLib.SoulApprentice) && wis >= 30) modssm += .2;
+				if (hasPerk(PerkLib.SoulPersonage) && wis >= 40) modssm += .2;
+				if (hasPerk(PerkLib.SoulWarrior) && wis >= 50) modssm += .2;
+			}
+			if (hasPerk(PerkLib.DaoistWarriorStage)) {
+				if (hasPerk(PerkLib.SoulSprite) && wis >= 60) modssm += .3;
+				if (hasPerk(PerkLib.SoulScholar) && wis >= 70) modssm += .3;
+				if (hasPerk(PerkLib.SoulElder) && wis >= 80) modssm += .3;
+			}
+			if (hasPerk(PerkLib.DaoistElderStage)) {
+				if (hasPerk(PerkLib.SoulExalt) && wis >= 90) modssm += .4;
+				if (hasPerk(PerkLib.SoulOverlord) && wis >= 100) modssm += .4;
+				if (hasPerk(PerkLib.SoulTyrant) && wis >= 110) modssm += .4;
+			}
+			if (hasPerk(PerkLib.DaoistOverlordStage)) {
+				if (hasPerk(PerkLib.SoulKing) && wis >= 120) modssm += .5;
+				if (hasPerk(PerkLib.SoulEmperor) && wis >= 130) modssm += .5;
+				if (hasPerk(PerkLib.SoulAncestor) && wis >= 140) modssm += .5;
+			}
+			if (hasPerk(PerkLib.HclassHeavenTribulationSurvivor)) modssm += .3;
+			if (hasPerk(PerkLib.GclassHeavenTribulationSurvivor)) modssm += .4;
+//	        if (hasPerk(PerkLib.FclassHeavenTribulationSurvivor)) modssm += .5;
+			if (hasPerk(PerkLib.DaoistsFocus)) modssm += perkv1(PerkLib.DaoistsFocus);
+			if (hasPerk(PerkLib.WizardsAndDaoistsFocus)) modssm += perkv2(PerkLib.WizardsAndDaoistsFocus);
+			if (hasPerk(PerkLib.SeersInsight)) modssm += perkv1(PerkLib.SeersInsight);
+			if (hasPerk(PerkLib.AscensionSpiritualEnlightenment)) modssm *= 1 + (perkv1(PerkLib.AscensionSpiritualEnlightenment) * 0.1);
+			if (shieldName == "spirit focus") modssm += .2;
+			return modssm;
+		}
+
+		public function soulskillCostMulti():Number {
+			var multiss:Number = 1;
+			if (soulskillMod() > 1) multiss += Math.round(soulskillMod() - 1) * 10;/*
+			if (hasPerk(PerkLib.SoulPersonage)) multiss += 1;
+			if (hasPerk(PerkLib.SoulWarrior)) multiss += 1;
+			if (hasPerk(PerkLib.SoulSprite)) multiss += 1;
+			if (hasPerk(PerkLib.SoulScholar)) multiss += 1;
+			if (hasPerk(PerkLib.SoulElder)) multiss += 1;
+			if (hasPerk(PerkLib.SoulExalt)) multiss += 1;
+			if (hasPerk(PerkLib.SoulOverlord)) multiss += 1;
+			if (hasPerk(PerkLib.SoulTyrant)) multiss += 1;
+			if (hasPerk(PerkLib.SoulKing)) multiss += 1;
+			if (hasPerk(PerkLib.SoulEmperor)) multiss += 1;
+			if (hasPerk(PerkLib.SoulAncestor)) multiss += 1;*/
+			if (level >= 24 && wis >= 80) multiss += 1;//początek używania Dao of Elements
+			if (level >= 42 && wis >= 140) multiss += 1;//początek zdolności latania
+			if (level >= 60 && wis >= 200) multiss += 1;//początek czegoś tam 1
+			if (level >= 78 && wis >= 260) multiss += 1;//początek czegoś tam 2
+			return multiss;
+		}
+
+		public function soulskillCost():Number {
+			var modssc:Number = 1;
+			if (hasPerk(PerkLib.DaoistCultivator)) modssc -= .1;
+			if (hasPerk(PerkLib.WizardsAndDaoistsEndurance)) modssc -= (0.01 * perkv2(PerkLib.WizardsAndDaoistsEndurance));
+			if (hasPerk(PerkLib.SeersInsight)) modssc -= perkv1(PerkLib.SeersInsight);
+			if (jewelryName == "fox hairpin") modssc -= .2;
+			if (modssc < 0.1) modssc = 0.1;
+			return modssc;
 		}
 	}
 }

@@ -65,7 +65,7 @@ public class Combat extends BaseContent {
 	//Used to display image of the enemy while fighting
 	//Set once during startCombat() to prevent it from changing every combat turn
 	private var imageText:String = "";
-	
+
 	public function get inCombat():Boolean {
         return CoC.instance.inCombat;
     }
@@ -2313,7 +2313,7 @@ public function attack():void {
 		enemyAI();
 		return;
 	}
-	
+
 	//Determine if dodged!
 	if ((player.hasStatusEffect(StatusEffects.Blind) && rand(2) == 0) || (monster.spe - player.spe > 0 && int(Math.random() * (((monster.spe - player.spe) / 4) + 80)) > 80)) {
 		//Akbal dodges special education
@@ -2354,7 +2354,7 @@ public function attack():void {
 	}
 	meleeDamageAcc();
 }
-	
+
 public function meleeDamageAcc():void {
 	var accMelee:Number = 0;
 	accMelee += (meleeAccuracy() / 2);
@@ -2770,7 +2770,7 @@ public function meleeDamageAcc():void {
 	heroBaneProc(damage);
 	}
 	else {
-		
+
 	}
 	if(monster.HP <= 0){doNext(endHpVictory); return;}
 	if(monster.lust >= monster.maxLust()){doNext(endLustVictory); return;}
@@ -5685,161 +5685,49 @@ public function greatDive():void {
 	monster.removeStatusEffect(StatusEffects.MonsterAttacksDisabled);
 	enemyAI();
 }
-
-public function soulskillMod():Number {
-	var modss:Number = 1;
-	if (player.hasPerk(PerkLib.DaoistCultivator) && player.wis >= 20) modss += .1;
-	if (player.hasPerk(PerkLib.DaoistApprenticeStage)) {
-		if (player.hasPerk(PerkLib.SoulApprentice) && player.wis >= 30) modss += .2;
-		if (player.hasPerk(PerkLib.SoulPersonage) && player.wis >= 40) modss += .2;
-		if (player.hasPerk(PerkLib.SoulWarrior) && player.wis >= 50) modss += .2;
-	}
-	if (player.hasPerk(PerkLib.DaoistWarriorStage)) {
-		if (player.hasPerk(PerkLib.SoulSprite) && player.wis >= 60) modss += .3;
-		if (player.hasPerk(PerkLib.SoulScholar) && player.wis >= 70) modss += .3;
-		if (player.hasPerk(PerkLib.SoulElder) && player.wis >= 80) modss += .3;
-	}
-	if (player.hasPerk(PerkLib.DaoistElderStage)) {
-		if (player.hasPerk(PerkLib.SoulExalt) && player.wis >= 90) modss += .4;
-		if (player.hasPerk(PerkLib.SoulOverlord) && player.wis >= 100) modss += .4;
-		if (player.hasPerk(PerkLib.SoulTyrant) && player.wis >= 110) modss += .4;
-	}
-	if (player.hasPerk(PerkLib.DaoistOverlordStage)) {
-		if (player.hasPerk(PerkLib.SoulKing) && player.wis >= 120) modss += .5;
-		if (player.hasPerk(PerkLib.SoulEmperor) && player.wis >= 130) modss += .5;
-		if (player.hasPerk(PerkLib.SoulAncestor) && player.wis >= 140) modss += .5;
-	}
-	if (player.hasPerk(PerkLib.HclassHeavenTribulationSurvivor)) modss += .3;
-	if (player.hasPerk(PerkLib.GclassHeavenTribulationSurvivor)) modss += .4;
-//	if (player.hasPerk(PerkLib.FclassHeavenTribulationSurvivor)) modss += .5;
-	if (player.hasPerk(PerkLib.DaoistsFocus)) modss += player.perkv1(PerkLib.DaoistsFocus);
-	if (player.hasPerk(PerkLib.WizardsAndDaoistsFocus)) modss += player.perkv2(PerkLib.WizardsAndDaoistsFocus);
-	if (player.hasPerk(PerkLib.SeersInsight)) modss += player.perkv1(PerkLib.SeersInsight);
-	if (player.hasPerk(PerkLib.AscensionSpiritualEnlightenment)) modss *= 1 + (player.perkv1(PerkLib.AscensionSpiritualEnlightenment) * 0.1);
-	if (player.shieldName == "spirit focus") modss += .2;
-	return modss;
-}
-public function soulskillPhysicalMod():Number {
-	var modssp:Number = 1;
-	if (player.hasPerk(PerkLib.HclassHeavenTribulationSurvivor)) modssp += .3;
-	if (player.hasPerk(PerkLib.GclassHeavenTribulationSurvivor)) modssp += .4;
-//	if (player.hasPerk(PerkLib.FclassHeavenTribulationSurvivor)) modssp += .5;
-	if (player.hasPerk(PerkLib.BodyCultivatorsFocus)) modssp += player.perkv1(PerkLib.BodyCultivatorsFocus);
-	if (player.hasPerk(PerkLib.AscensionSpiritualEnlightenment)) modssp *= 1 + (player.perkv1(PerkLib.AscensionSpiritualEnlightenment) * 0.1);
-	return modssp;
-}
-public function soulskillMagicalMod():Number {
-	var modssm:Number = 1;
-	if (player.hasPerk(PerkLib.DaoistCultivator) && player.wis >= 20) modssm += .1;
-	if (player.hasPerk(PerkLib.DaoistApprenticeStage)) {
-		if (player.hasPerk(PerkLib.SoulApprentice) && player.wis >= 30) modssm += .2;
-		if (player.hasPerk(PerkLib.SoulPersonage) && player.wis >= 40) modssm += .2;
-		if (player.hasPerk(PerkLib.SoulWarrior) && player.wis >= 50) modssm += .2;
-	}
-	if (player.hasPerk(PerkLib.DaoistWarriorStage)) {
-		if (player.hasPerk(PerkLib.SoulSprite) && player.wis >= 60) modssm += .3;
-		if (player.hasPerk(PerkLib.SoulScholar) && player.wis >= 70) modssm += .3;
-		if (player.hasPerk(PerkLib.SoulElder) && player.wis >= 80) modssm += .3;
-	}
-	if (player.hasPerk(PerkLib.DaoistElderStage)) {
-		if (player.hasPerk(PerkLib.SoulExalt) && player.wis >= 90) modssm += .4;
-		if (player.hasPerk(PerkLib.SoulOverlord) && player.wis >= 100) modssm += .4;
-		if (player.hasPerk(PerkLib.SoulTyrant) && player.wis >= 110) modssm += .4;
-	}
-	if (player.hasPerk(PerkLib.DaoistOverlordStage)) {
-		if (player.hasPerk(PerkLib.SoulKing) && player.wis >= 120) modssm += .5;
-		if (player.hasPerk(PerkLib.SoulEmperor) && player.wis >= 130) modssm += .5;
-		if (player.hasPerk(PerkLib.SoulAncestor) && player.wis >= 140) modssm += .5;
-	}
-	if (player.hasPerk(PerkLib.HclassHeavenTribulationSurvivor)) modssm += .3;
-	if (player.hasPerk(PerkLib.GclassHeavenTribulationSurvivor)) modssm += .4;
-//	if (player.hasPerk(PerkLib.FclassHeavenTribulationSurvivor)) modssm += .5;
-	if (player.hasPerk(PerkLib.DaoistsFocus)) modssm += player.perkv1(PerkLib.DaoistsFocus);
-	if (player.hasPerk(PerkLib.WizardsAndDaoistsFocus)) modssm += player.perkv2(PerkLib.WizardsAndDaoistsFocus);
-	if (player.hasPerk(PerkLib.SeersInsight)) modssm += player.perkv1(PerkLib.SeersInsight);
-	if (player.hasPerk(PerkLib.AscensionSpiritualEnlightenment)) modssm *= 1 + (player.perkv1(PerkLib.AscensionSpiritualEnlightenment) * 0.1);
-	if (player.shieldName == "spirit focus") modssm += .2;
-	return modssm;
-}
-
-public function soulskillcostmulti():Number {
-	var multiss:Number = 1;
-	if (soulskillMod() > 1) multiss += (soulskillMod() - 1) * 0.1;/*
-	if (player.hasPerk(PerkLib.SoulPersonage)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulWarrior)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulSprite)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulScholar)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulElder)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulExalt)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulOverlord)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulTyrant)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulKing)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulEmperor)) multiss += 1;
-	if (player.hasPerk(PerkLib.SoulAncestor)) multiss += 1;*/
-	if (player.level >= 24 && player.wis >= 80) multiss += 1;//początek używania Dao of Elements
-	if (player.level >= 42 && player.wis >= 140) multiss += 1;//początek zdolności latania
-	if (player.level >= 60 && player.wis >= 200) multiss += 1;//początek czegoś tam 1
-	if (player.level >= 78 && player.wis >= 260) multiss += 1;//początek czegoś tam 2
-	return multiss;
-}
-
-public function soulskillCost():Number {
-	var modssc:Number = 1;
-	if (player.hasPerk(PerkLib.DaoistCultivator)) modssc -= .1;
-	if (player.hasPerk(PerkLib.WizardsAndDaoistsEndurance)) modssc -= (0.01 * player.perkv2(PerkLib.WizardsAndDaoistsEndurance));
-	if (player.hasPerk(PerkLib.SeersInsight)) modssc -= player.perkv1(PerkLib.SeersInsight);
-	if (player.jewelryName == "fox hairpin") modssc -= .2;
-	if (modssc < 0.1) modssc = 0.1;
-	return modssc;
-}
-
-	private function touSpeStrScale(stat:int):Number{
-		var scale:Number = 0;
-		for(var i:int = 20; (i <= 80) && (i <= stat); i += 20){
-			scale += stat - i;
-		}
-		for(i = 100; (i <= 2000) && (i <= stat); i += 50){
-			scale += stat - i;
-		}
-		return scale;
+	//TODO @Oxdeception inline below
+	public function soulskillMod():Number {
+		return player.soulskillMod();
 	}
 
-	private function inteWisLibScale(stat:int):Number{
-		var scale:Number = 6.75;
-		var changeBy:Number = 0.50;
-		if(stat <= 2000){
-			if(stat <= 100){
-				scale = (2/6) + ((int(stat/100)/20) * (1/6));
-				changeBy = 0.25;
-			} else {
-				scale = 1 + (int((stat - 100)/50) * 0.25);
-			}
-		}
-		return (stat * scale) + rand(stat * (scale + changeBy));
+	public function soulskillPhysicalMod():Number {
+		return player.soulskillPhysicalMod();
+	}
+
+	public function soulskillMagicalMod():Number {
+		return player.soulskillMagicalMod();
+	}
+
+	public function soulskillcostmulti():Number {
+		return player.soulskillCostMulti();
+	}
+
+	public function soulskillCost():Number {
+		return player.soulskillCost();
 	}
 
 	public function scalingBonusToughness():Number {
-		return touSpeStrScale(player.tou);
+		return player.scalingBonusToughness();
 	}
 
 	public function scalingBonusSpeed():Number {
-		return touSpeStrScale(player.spe);
+		return player.scalingBonusSpeed();
 	}
 
 	public function scalingBonusStrength():Number {
-		return touSpeStrScale(player.str);
+		return player.scalingBonusStrength();
 	}
 
 	public function scalingBonusWisdom():Number {
-		return touSpeStrScale(player.wis);
+		return player.scalingBonusWisdom();
 	}
 
 	public function scalingBonusIntelligence():Number {
-		return touSpeStrScale(player.inte);
+		return player.scalingBonusIntelligence();
 	}
 
 	public function scalingBonusLibido():Number {
-		return inteWisLibScale(player.lib);
+		return player.scalingBonusLibido();
 	}
 }
 }
