@@ -5,8 +5,9 @@ import classes.BodyParts.Butt;
 import classes.BodyParts.Hips;
 import classes.BodyParts.Tail;
 import classes.Scenes.SceneLib;
+	import classes.StatusEffects.CombatStatusEffect;
 
-public class SpiderMorphMob extends Monster
+	public class SpiderMorphMob extends Monster
 	{
 		//==============================
 		// SPOIDAH HORDE COMBAT SHIZZLE HERE!
@@ -58,7 +59,8 @@ public class SpiderMorphMob extends Monster
 			else {
 				outputText("Some of the spiders and driders launch huge globs of wet webbing right at you, hitting you in the torso!  You try to wiggle out, but it's no use; you're stuck like this for now.  Though comfortingly, the driders' open stance and self-satisfaction allow Kiha to blast them in the side with a huge conflagration!");
 				//(PC cannot attack or use spells for one turn; can use Magical Special and Possess)
-				player.createStatusEffect(StatusEffects.UBERWEB,0,0,0,0);
+				var status:CombatStatusEffect = player.createStatusEffect(StatusEffects.UBERWEB,0,0,0,0) as CombatStatusEffect;
+				status.updateString = "<b>You're pinned under a pile of webbing!  You should probably struggle out of it and get back in the fight!</b>\n\n";
 				HP -= 250;
 			}
 		}

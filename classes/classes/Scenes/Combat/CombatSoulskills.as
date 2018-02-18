@@ -9,8 +9,9 @@ import classes.Items.WeaponLib;
 import classes.PerkLib;
 import classes.Scenes.API.FnHelpers;
 import classes.StatusEffects;
+	import classes.StatusEffects.CombatStatusEffect;
 
-import coc.view.ButtonData;
+	import coc.view.ButtonData;
 import coc.view.ButtonDataList;
 
 public class CombatSoulskills extends BaseCombatContent {
@@ -507,8 +508,9 @@ public class CombatSoulskills extends BaseCombatContent {
 		var soulforcecost:int = 30 * soulskillCost() * soulskillcostmulti();
 		player.soulforce -= soulforcecost;
 		outputText("Your movement becomes more fluid and precise, increasing your speed and evasion.\n\n");
-		player.createStatusEffect(StatusEffects.HurricaneDance, 5, 0, 0, 0);
-		player.createStatusEffect(StatusEffects.CooldownHurricaneDance, 10, 0, 0, 0);
+		var status:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.HurricaneDance, 5);
+		status.removeString = "<b>Hurricane Dance effect wore off!</b>\n\n";
+		combat.createCombatStatus(player,StatusEffects.CooldownHurricaneDance, 10);
 		enemyAI();
 	}
 
@@ -517,8 +519,9 @@ public class CombatSoulskills extends BaseCombatContent {
 		var soulforcecost:int = 30 * soulskillCost() * soulskillcostmulti();
 		player.soulforce -= soulforcecost;
 		outputText("Your body suddenly hardens like rock. You will be way harder to damage for a while.\n\n");
-		player.createStatusEffect(StatusEffects.EarthStance, 3, 0, 0, 0);
-		player.createStatusEffect(StatusEffects.CooldownEarthStance, 10, 0, 0, 0);
+		var status:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.EarthStance, 3);
+		status.removeString = "<b>Earth Stance effect wore off!</b>\n\n";
+		combat.createCombatStatus(player,StatusEffects.CooldownEarthStance, 10);
 		enemyAI();
 	}
 
@@ -549,7 +552,7 @@ public class CombatSoulskills extends BaseCombatContent {
 		damage *= (monster.damagePercent() / 100);
 		damage = doDamage(damage);
 		monster.createStatusEffect(StatusEffects.PunishingKick, 5, 0, 0, 0);
-		player.createStatusEffect(StatusEffects.CooldownPunishingKick, 10, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownPunishingKick, 10);
 		outputText("You lash out with a devastating kick, knocking your opponent back and disorienting it. " + monster.capitalA + monster.short + " will have a hard time recovering its balance for a while. <b><font color=\"#800000\">" + damage + "</font></b> damage!");
 		if (crit == true) outputText(" <b>*Critical Hit!*</b>");
 		checkAchievementDamage(damage);
@@ -590,7 +593,7 @@ public class CombatSoulskills extends BaseCombatContent {
 		//final touches
 		damage *= (monster.damagePercent() / 100);
 		damage = doDamage(damage);
-		player.createStatusEffect(StatusEffects.CooldownSoulBlast, 15, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownSoulBlast, 15);
 		outputText("You wave the sign of the gate, tiger and serpent as you unlock all of your soulforce for an attack. " + monster.capitalA + monster.short + " can’t figure out what you are doing until a small sphere of energy explodes at the end of your fist in a massive beam of condensed soulforce. <b><font color=\"#800000\">" + damage + "</font></b> damage!");
 		if (crit == true) outputText(" <b>*Critical Hit!*</b>");
 		if (!monster.hasPerk(PerkLib.Resolute)) monster.createStatusEffect(StatusEffects.Stunned, 3, 0, 0, 0);
@@ -724,13 +727,13 @@ public class CombatSoulskills extends BaseCombatContent {
 	public function BladeDance():void {
 		clearOutput();
 		outputText("You momentarily attune yourself to the song of the mother tree, and dance forward, darting your blade around your enemy.\n\n");
-		player.createStatusEffect(StatusEffects.BladeDance,0,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.BladeDance,0);
 		combat.basemeleeattacks();
 	}
 	public function ResonanceVolley():void {
 		clearOutput();
 		outputText("You ready your bow, infusing it with a figment of soulforce. The energy awakens the wood’s connection to the world tree, causing the bow to pulse beneath your fingers.\n\n");
-		player.createStatusEffect(StatusEffects.ResonanceVolley,0,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.ResonanceVolley,0);
 		combat.fireBow();
 	}
 	public function AvatarOfTheSong():void {

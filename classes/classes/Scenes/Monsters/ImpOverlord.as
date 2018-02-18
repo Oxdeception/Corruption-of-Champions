@@ -7,7 +7,8 @@ import classes.BodyParts.LowerBody;
 import classes.BodyParts.Wings;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
-import classes.internals.*;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.*;
 
 public class ImpOverlord extends Imp
 	{
@@ -59,12 +60,12 @@ public class ImpOverlord extends Imp
 				if (player.hasPerk(PerkLib.FromTheFrozenWaste) || player.hasPerk(PerkLib.ColdAffinity)) damage *= 3;
 				if (player.hasPerk(PerkLib.FireAffinity)) damage *= 0.3;
 				if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-				player.addStatusValue(StatusEffects.Blizzard, 1, -1);
-				outputText("The imp narrows his eyes and focuses his mind with deadly intent. He snaps his fingers and you are enveloped in a flash of white flames!  Thanks to surrounding you ice shards this attack isn't at it peak power!  ");
-				damage *= 0.2;
+					outputText("The imp narrows his eyes and focuses his mind with deadly intent. He snaps his fingers and you are enveloped in a flash of white flames!  Thanks to surrounding you ice shards this attack isn't at it peak power!  ");
+					damage *= 0.2;
+					(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				}
 				else {
-				outputText("The imp narrows his eyes and focuses his mind with deadly intent. He snaps his fingers and you are enveloped in a flash of white flames!  ");
+					outputText("The imp narrows his eyes and focuses his mind with deadly intent. He snaps his fingers and you are enveloped in a flash of white flames!  ");
 				}
 				if (player.isGoo()) {
 					damage *= 1.5;

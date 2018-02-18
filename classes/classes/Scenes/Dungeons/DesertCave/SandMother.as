@@ -4,8 +4,9 @@ import classes.*;
 import classes.BodyParts.Butt;
 import classes.BodyParts.Hips;
 import classes.Scenes.SceneLib;
+	import classes.StatusEffects.CombatStatusEffect;
 
-public class SandMother extends Monster
+	public class SandMother extends Monster
 	{
 		//Notes:
 		//Starts combat with sandstorm.  GigaFire's every fifth round.
@@ -62,7 +63,7 @@ public class SandMother extends Monster
 				}
 			}
 			if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-				player.addStatusValue(StatusEffects.Blizzard, 1, -1);
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				damage *= 0.2;
 				damage = Math.round(damage);
 			}

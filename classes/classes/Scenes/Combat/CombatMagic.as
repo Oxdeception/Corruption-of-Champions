@@ -18,7 +18,8 @@ import classes.Scenes.NPCs.JojoScene;
 import classes.Scenes.Places.TelAdre.UmasShop;
 import classes.Scenes.SceneLib;
 import classes.StatusEffects;
-import classes.VaginaClass;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.VaginaClass;
 
 import coc.view.ButtonData;
 import coc.view.ButtonDataList;
@@ -1661,8 +1662,9 @@ public class CombatMagic extends BaseCombatContent {
 		if (player.hasPerk(PerkLib.LongerLastingBuffsVI)) ChargeWeaponDuration += 1;
 		if (player.hasPerk(PerkLib.EverLastingBuffs)) ChargeWeaponDuration += 5;
 		if (player.hasPerk(PerkLib.EternalyLastingBuffs)) ChargeWeaponDuration += 5;
+		var status:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.ChargeWeapon,ChargeWeaponDuration,ChargeWeaponBoost,ChargeWeaponDuration);
+		status.removeString = "<b>Charged Weapon effect wore off!</b>\n\n";
 		if (silent) {
-			player.createStatusEffect(StatusEffects.ChargeWeapon,ChargeWeaponBoost,ChargeWeaponDuration,0,0);
 			statScreenRefresh();
 			return;
 		}
@@ -1677,7 +1679,7 @@ public class CombatMagic extends BaseCombatContent {
 		}
 		clearOutput();
 		outputText("You utter words of power, summoning an electrical charge around your [weapon].  It crackles loudly, ensuring you'll do more damage with it for the rest of the fight.\n\n");
-		player.createStatusEffect(StatusEffects.ChargeWeapon, ChargeWeaponBoost, ChargeWeaponDuration, 0, 0);
+
 		if (player.weapon == weapons.DEMSCYT && player.cor < 90) dynStats("cor", 0.3);
 		statScreenRefresh();
 		flags[kFLAGS.SPELLS_CAST]++;
@@ -1736,8 +1738,9 @@ public class CombatMagic extends BaseCombatContent {
 		if (player.hasPerk(PerkLib.LongerLastingBuffsVI)) ChargeArmorDuration += 1;
 		if (player.hasPerk(PerkLib.EverLastingBuffs)) ChargeArmorDuration += 5;
 		if (player.hasPerk(PerkLib.EternalyLastingBuffs)) ChargeArmorDuration += 5;
+		var pk:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.ChargeArmor,ChargeArmorDuration,ChargeArmorBoost,ChargeArmorDuration);
+		pk.removeString = "<b>Charged Armor effect wore off!</b>\n\n";
 		if (silent) {
-			player.createStatusEffect(StatusEffects.ChargeArmor,ChargeArmorBoost,ChargeArmorDuration,0,0);
 			statScreenRefresh();
 			return;
 		}
@@ -1755,7 +1758,6 @@ public class CombatMagic extends BaseCombatContent {
 		if (player.isNaked() && player.haveNaturalArmor() && player.hasPerk(PerkLib.ImprovingNaturesBlueprintsNaturalArmor)) outputText(" natural armor.");
 		else outputText(" [armor].");
 		outputText("  It crackles loudly, ensuring you'll have more protection for the rest of the fight.\n\n");
-		player.createStatusEffect(StatusEffects.ChargeArmor, ChargeArmorBoost, ChargeArmorDuration, 0, 0);
 		if (player.weapon == weapons.DEMSCYT && player.cor < 90) dynStats("cor", 0.3);
 		statScreenRefresh();
 		flags[kFLAGS.SPELLS_CAST]++;
@@ -2018,14 +2020,6 @@ public class CombatMagic extends BaseCombatContent {
 		if (player.hasPerk(PerkLib.LastResort) && player.mana < spellCostWhite(40)) player.HP -= spellCostWhite(40);
 		else useMana(40,5);
 		if(handleShell()){return;}
-		//if (monster is Doppleganger)
-		//{
-		//(monster as Doppleganger).handleSpellResistance("whitefire");
-		//flags[kFLAGS.SPELLS_CAST]++;
-		//if(!player.hasStatusEffect(StatusEffects.CastedSpell)) player.createStatusEffect(StatusEffects.CastedSpell,0,0,0,0);
-		//spellPerkUnlock();
-		//return;
-		//}
 		if (monster is FrostGiant && player.hasStatusEffect(StatusEffects.GiantBoulder)) {
 			(monster as FrostGiant).giantBoulderHit(2);
 			enemyAI();
@@ -2034,7 +2028,6 @@ public class CombatMagic extends BaseCombatContent {
 		clearOutput();
 		outputText("You charge out energy in your hand and fire it out in the form of a powerful bolt of lightning at " + monster.a + monster.short + " !\n");
 		var damage:Number = scalingBonusIntelligence() * spellModWhite();
-		//Determine if critical hit!
 		var crit:Boolean = false;
 		var critChance:int = 5;
 		if (player.hasPerk(PerkLib.Tactician) && player.inte >= 50) {
@@ -2046,7 +2039,6 @@ public class CombatMagic extends BaseCombatContent {
 			crit = true;
 			damage *= 1.75;
 		}
-		//High damage to goes.
 		damage = calcVoltageMod(damage);
 		if (monster.hasPerk(PerkLib.DarknessNature)) damage *= 5;
 		if (monster.hasPerk(PerkLib.LightningVulnerability)) damage *= 2;
@@ -2055,14 +2047,8 @@ public class CombatMagic extends BaseCombatContent {
 		if (player.hasPerk(PerkLib.LightningAffinity)) damage *= 2;
 		if (player.hasPerk(PerkLib.ElectrifiedDesire)) damage *= (1 + (player.lust100 * 0.01));
 		damage = Math.round(damage);
-		//if (monster.short == "goo-girl") damage = Math.round(damage * 1.5); - pomyśleć czy bdą dostawać bonusowe obrażenia
-		//if (monster.short == "tentacle beast") damage = Math.round(damage * 1.2); - tak samo przemyśleć czy bedą dodatkowo ranione
 		outputText(monster.capitalA + monster.short + " takes <b><font color=\"#800000\">" + damage + "</font></b> damage.");
-		//Using fire attacks on the goo]
-		//if(monster.short == "goo-girl") {
-		//outputText("  Your flames lick the girl's body and she opens her mouth in pained protest as you evaporate much of her moisture. When the fire passes, she seems a bit smaller and her slimy " + monster.skinTone + " skin has lost some of its shimmer.");
-		//if(!monster.hasPerk(PerkLib.Acid)) monster.createPerk(PerkLib.Acid,0,0,0,0);
-		//}
+
 		if (crit == true) outputText(" <b>*Critical Hit!*</b>");
 		outputText("\n\n");
 		if (player.weapon == weapons.DEMSCYT && player.cor < 90) dynStats("cor", 0.3);
@@ -2090,12 +2076,17 @@ public class CombatMagic extends BaseCombatContent {
 		}
 		clearOutput();
 		outputText("You utter words of power, summoning an ice storm.  It swirls arounds you, ensuring that you'll have more protection from the fire attacks for a few moments.\n\n");
+		var duration:int;
 		if (player.hasPerk(PerkLib.ColdMastery) || player.hasPerk(PerkLib.ColdAffinity)) {
-			player.createStatusEffect(StatusEffects.Blizzard, 2 + player.inte / 10,0,0,0);
+			duration = 2 + player.inte / 10;
 		}
 		else {
-			player.createStatusEffect(StatusEffects.Blizzard, 1 + player.inte / 25,0,0,0);
+			duration = 1 + player.inte / 25;
 		}
+		var status:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.Blizzard,duration);
+		status.removeString = "<b>Blizzard spell exhausted all of it power and need to be casted again to provide protection from fire attacks again!</b>\n\n";
+		status.updateString = "<b>Your surrounding blizzard slowly losing it protective power.</b>\n\n";
+		status.manualString = "Your surrounding blizzard absorbed huge part of the attack at the price of losing some of it protective power.\n";
 		if (player.weapon == weapons.DEMSCYT && player.cor < 90) dynStats("cor", 0.3);
 		statScreenRefresh();
 		flags[kFLAGS.SPELLS_CAST]++;

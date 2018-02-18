@@ -5,7 +5,8 @@ import classes.BodyParts.Butt;
 import classes.BodyParts.Hips;
 import classes.BodyParts.Tail;
 import classes.Scenes.SceneLib;
-import classes.internals.WeightedDrop;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.WeightedDrop;
 
 public class Akbal extends Monster
 	{
@@ -138,7 +139,7 @@ public class Akbal extends Monster
 					return;
 				}
 				if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-					player.addStatusValue(StatusEffects.Blizzard, 1, -1);
+					(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 					var damage2:int = inte / 4;
 					if (player.hasPerk(PerkLib.FromTheFrozenWaste) || player.hasPerk(PerkLib.ColdAffinity)) damage2 *= 3;
 					if (player.hasPerk(PerkLib.FireAffinity)) damage2 *= 0.3;

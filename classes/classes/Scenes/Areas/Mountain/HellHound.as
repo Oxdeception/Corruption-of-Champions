@@ -6,7 +6,9 @@ import classes.BodyParts.Hips;
 import classes.BodyParts.LowerBody;
 import classes.BodyParts.Tail;
 import classes.Scenes.SceneLib;
-import classes.internals.*;
+
+import classes.StatusEffects.CombatStatusEffect;
+	importclasses.internals.*;
 
 public class HellHound extends Monster
 	{
@@ -39,12 +41,12 @@ public class HellHound extends Monster
 				if (player.hasPerk(PerkLib.FireAffinity)) temp *= 0.3;
 				temp = Math.round(temp);
 				if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-				player.addStatusValue(StatusEffects.Blizzard,1,-1);
-				temp *= 0.2;
-				outputText("Both the hellhound's heads breathe in deeply before blasting a wave of dark fire at you. While the flames don't burn much due to protection of blizzard, the unnatural heat fills your body with arousal. ");
+					temp *= 0.2;
+					outputText("Both the hellhound's heads breathe in deeply before blasting a wave of dark fire at you. While the flames don't burn much due to protection of blizzard, the unnatural heat fills your body with arousal. ");
+					(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				}
 				else {
-				outputText("Both the hellhound's heads breathe in deeply before blasting a wave of dark fire at you. While the flames don't burn much, the unnatural heat fills your body with arousal. ");
+					outputText("Both the hellhound's heads breathe in deeply before blasting a wave of dark fire at you. While the flames don't burn much, the unnatural heat fills your body with arousal. ");
 				}
 				temp = Math.round(temp);
 				player.takeMagicDamage(temp, true);

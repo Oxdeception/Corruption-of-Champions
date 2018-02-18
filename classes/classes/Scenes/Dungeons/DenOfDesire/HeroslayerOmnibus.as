@@ -10,8 +10,9 @@ import classes.BodyParts.Hips;
 import classes.BodyParts.LowerBody;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
+	import classes.StatusEffects.CombatStatusEffect;
 
-public class HeroslayerOmnibus extends Monster
+	public class HeroslayerOmnibus extends Monster
 	{
 		public function moveLustAura():void {
 			outputText("The demoness blinks her eyes closed and knits her eyebrows in concentration.  The red orbs open wide and she smiles, licking her lips.   The air around her grows warmer, and muskier, as if her presence has saturated it with lust.");
@@ -119,7 +120,9 @@ public class HeroslayerOmnibus extends Monster
 		
 		public function moveHerobane():void {
 			outputText("The omnibus throws an ethereal chain at you, binding you to her.");
-			player.createStatusEffect(StatusEffects.HeroBane, 2, 0, 0, 0);
+			var status:CombatStatusEffect = player.createStatusEffect(StatusEffects.HeroBane, 2, 0, 0, 0) as CombatStatusEffect;
+			status.removeString = "<b>You feel your body lighten as the curse linking your vitality to that of the omnibus ends.</b>\n\n";
+			status.duration = 2;
 		}
 		
 		override protected function performCombatAction():void

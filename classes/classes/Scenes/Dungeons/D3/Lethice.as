@@ -8,7 +8,8 @@ import classes.Monster;
 import classes.PerkLib;
 import classes.Scenes.SceneLib;
 import classes.StatusEffects;
-import classes.internals.WeightedDrop;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.WeightedDrop;
 
 public class Lethice extends Monster
 	{
@@ -797,7 +798,9 @@ public class Lethice extends Monster
 				var damage:Number = weaponAttack + 25 - rand(player.tou);
 				player.takePhysDamage(damage,true);
 
-				player.createStatusEffect(StatusEffects.WhipSilence, 3, 0, 0, 0);
+				var status:CombatStatusEffect = player.createStatusEffect(StatusEffects.WhipSilence, 3, 0, 0, 0) as CombatStatusEffect;
+				status.duration = 3;
+				status.removeString = "<b>The constricting cords encircling your neck fall away, their flames guttering into nothingness. It seems even a Demon Queen’s magic has an expiration date.</b>\n\n";
 			}
 		}
 	

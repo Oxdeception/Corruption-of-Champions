@@ -7,7 +7,8 @@ import classes.BodyParts.Skin;
 import classes.BodyParts.Tail;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
-import classes.internals.*;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.*;
 
 public class Kitsune extends Monster
 	{
@@ -61,9 +62,9 @@ public class Kitsune extends Monster
 			if (player.hasPerk(PerkLib.FromTheFrozenWaste) || player.hasPerk(PerkLib.ColdAffinity)) damage *= 3;
 			if (player.hasPerk(PerkLib.FireAffinity)) damage *= 0.3;
 			if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-				player.addStatusValue(StatusEffects.Blizzard,1,-1);
 				outputText("\n\nThe flames burn furiously but power was negated by surround you blizzard, but still it leave you with an incredibly pleasant tingling sensation all over your body.  Your skin flushes with excitement, and you can feel blood rushing to your extremities, making you shudder with pleasure. ");
 				damage *= 0.2;
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 			}
 			else {
 				outputText("\n\nThe flames burn furiously, but leave you with an incredibly pleasant tingling sensation all over your body.  Your skin flushes with excitement, and you can feel blood rushing to your extremities, making you shudder with pleasure. ");

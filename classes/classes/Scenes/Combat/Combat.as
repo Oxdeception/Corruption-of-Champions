@@ -7,6 +7,7 @@
 	import classes.BodyParts.Tail;
 	import classes.CoC;
 	import classes.CoC_Settings;
+	import classes.Creature;
 	import classes.EngineCore;
 	import classes.GlobalFlags.kACHIEVEMENTS;
 	import classes.GlobalFlags.kFLAGS;
@@ -36,7 +37,9 @@
 	import classes.Scenes.Places.TelAdre.UmasShop;
 	import classes.Scenes.SceneLib;
 	import classes.StatusEffectClass;
+	import classes.StatusEffectType;
 	import classes.StatusEffects;
+	import classes.StatusEffects.CombatStatusEffect;
 	import classes.StatusEffects.VampireThirstEffect;
 
 	import coc.view.ButtonData;
@@ -1280,6 +1283,7 @@
 			return onearrowcost;
 		}
 
+		//todo @Oxdeception move vars into weaponRange, merge attack functions for bow/gun/thrown
 		public function fireBow():void {
 			clearOutput();
 			if (monster.hasStatusEffect(StatusEffects.BowDisabled)) {
@@ -2057,6 +2061,7 @@
 			enemyAI();
 		}
 
+		//todo @Oxdeception push handling/vars into weaponRange
 		public function reloadWeapon():void {
 			if (player.weaponRangeName == "Ivory inlaid arquebus") player.ammo = 12;
 			if (player.weaponRangeName == "blunderbuss rifle") player.ammo = 9;
@@ -2142,7 +2147,7 @@
 		public function defendpose():void {
 			clearOutput();
 			outputText("You decide not to take any offensive action this round preparing for [monster a] [monster name] attack assuming defensive pose.\n\n");
-			player.createStatusEffect(StatusEffects.Defend, 0, 0, 0, 0);
+			combat.createCombatStatus(player,StatusEffects.Defend, 0);
 			if (player.hasPerk(PerkLib.DefenceStance)) {
 				wrathregeneration();
 				fatigueRecovery();
@@ -2155,8 +2160,8 @@
 			clearOutput();
 			outputText("You enter your second wind, recovering your energy.\n\n");
 			fatigue((player.maxFatigue() - player.fatigue) / 2);
-			player.createStatusEffect(StatusEffects.SecondWindRegen, 10, 0, 0, 0);
-			player.createStatusEffect(StatusEffects.CooldownSecondWind, 0, 0, 0, 0);
+			combat.createCombatStatus(player,StatusEffects.SecondWindRegen,1, 10);
+			combat.createCombatStatus(player,StatusEffects.CooldownSecondWind, 1);
 			wrathregeneration();
 			fatigueRecovery();
 			manaregeneration();
@@ -2205,6 +2210,7 @@
 		}
 
 //ATTACK
+		//todo @Oxdeception base attack function needs major cleanups
 		public function attack():void {
 			flags[kFLAGS.LAST_ATTACK_TYPE] = 4;
 //	if(!player.hasStatusEffect(StatusEffects.FirstAttack)) {
@@ -3101,6 +3107,8 @@
 			}
 			cleanupAfterCombat();
 		}
+
+		//todo @Oxdeception push item handling into monster
 		public function dropItem(monster:Monster, nextFunc:Function = null):void {
 			if (nextFunc == null) nextFunc = camp.returnToCampUseOneHour;
 			if(monster.hasStatusEffect(StatusEffects.NoLoot)) {
@@ -3214,14 +3222,8 @@
 				monster.gems = Math.round(monster.gems);
 			}
 			monster.handleAwardText(); //Each monster can now override the default award text
-			if (!inDungeon && !inRoomedDungeon && !prison.inPrison) { //Not in dungeons
-				if (nextFunc != null) doNext(nextFunc);
-				else doNext(playerMenu);
-			}
-			else {
-				if (nextFunc != null) doNext(nextFunc);
-				else doNext(playerMenu);
-			}
+			if (nextFunc != null) doNext(nextFunc);
+			else doNext(playerMenu);
 			dropItem(monster, nextFunc);
 			inCombat = false;
 			player.gems += monster.gems;
@@ -3230,14 +3232,18 @@
 			dynStats("lust", 0, "scale", false); //Forces up arrow.
 		}
 
-//Update combat status effects
+
+		//todo @Oxdeception set up as many statuses as possible as combat statuses, reduce update function
 		private function combatStatusesUpdate():void {
 			//old outfit used for fetish cultists
 			var oldOutfit:String = "";
 			var changed:Boolean = false;
 			//Reset menuloc
-//This is now automatic - newRound arg defaults to true:	menuLoc = 0;
+			//This is now automatic - newRound arg defaults to true:	menuLoc = 0;
 			hideUpDown();
+			for each (var status:StatusEffectClass in player.statusEffects){
+				status.onCombatRound();
+			}
 			if (player.hasStatusEffect(StatusEffects.MinotaurKingMusk))
 			{
 				dynStats("lus+", 3);
@@ -3256,15 +3262,6 @@
 					player.addStatusValue(StatusEffects.Sealed2,1,-1);
 					if(player.statusEffectv1(StatusEffects.Sealed2) <= 0) player.removeStatusEffect(StatusEffects.Sealed2);
 					else outputText("<b>One of your combat abilities is currently disabled as aftereffect of recent enemy attack!</b>\n\n");
-				}
-			}
-			if (player.hasStatusEffect(StatusEffects.WhipSilence))
-			{
-				player.addStatusValue(StatusEffects.WhipSilence, 1, -1);
-				if (player.statusEffectv1(StatusEffects.WhipSilence) <= 0)
-				{
-					player.removeStatusEffect(StatusEffects.WhipSilence);
-					outputText("<b>The constricting cords encircling your neck fall away, their flames guttering into nothingness. It seems even a Demon Queen’s magic has an expiration date.</b>\n\n");
 				}
 			}
 			if (player.hasStatusEffect(StatusEffects.PigbysHands))
@@ -3423,8 +3420,6 @@
 			if(player.hasStatusEffect(StatusEffects.HolliConstrict)) {
 				outputText("<b>You're tangled up in Holli's verdant limbs!  All you can do is try to struggle free...</b>\n\n");
 			}
-			if(player.hasStatusEffect(StatusEffects.UBERWEB))
-				outputText("<b>You're pinned under a pile of webbing!  You should probably struggle out of it and get back in the fight!</b>\n\n");
 			if (player.hasStatusEffect(StatusEffects.Blind) && !monster.hasStatusEffect(StatusEffects.Sandstorm) && !player.hasStatusEffect(StatusEffects.PurpleHaze))
 			{
 				if (player.hasStatusEffect(StatusEffects.SheilaOil))
@@ -3518,13 +3513,6 @@
 				deoxigen += (player.maxHP() * 0.05);
 				deoxigen = player.takePhysDamage(deoxigen);
 				outputText("<b>You are running out of oxygen you need to finish this fight and fast before you lose consciousness. <b>(<font color=\"#800000\">" + deoxigen + "</font>)</b></b>\n\n");
-			}
-			if(player.hasStatusEffect(StatusEffects.HeroBane)) {
-				player.addStatusValue(StatusEffects.HeroBane,1,-1);
-				if(player.statusEffectv1(StatusEffects.HeroBane) <= 0) {
-					player.removeStatusEffect(StatusEffects.HeroBane);
-					outputText("<b>You feel your body lighten as the curse linking your vitality to that of the omnibus ends.</b>\n\n");
-				}
 			}
 			if(player.hasStatusEffect(StatusEffects.AcidSlap)) {
 				var slap:Number = 3 + (player.maxHP() * 0.02);
@@ -3802,21 +3790,6 @@
 			if (player.hasStatusEffect(StatusEffects.GiantBoulder)) {
 				outputText("<b>There is a large boulder coming your way. If you don't avoid it in time, you might take some serious damage.</b>\n\n");
 			}
-			//Berzerker/Lustzerker/Dwarf Rage/Oni Rampage/Maleficium
-			if (player.hasStatusEffect(StatusEffects.Berzerking)) {
-				if (player.statusEffectv1(StatusEffects.Berzerking) <= 0) {
-					player.removeStatusEffect(StatusEffects.Berzerking);
-					outputText("<b>Berserker effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.Berzerking,1,-1);
-			}
-			if (player.hasStatusEffect(StatusEffects.Lustzerking)) {
-				if (player.statusEffectv1(StatusEffects.Lustzerking) <= 0) {
-					player.removeStatusEffect(StatusEffects.Lustzerking);
-					outputText("<b>Lustzerker effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.Lustzerking,1,-1);
-			}
 			if (player.hasStatusEffect(StatusEffects.DwarfRage)) {
 				if (player.statusEffectv3(StatusEffects.DwarfRage) <= 0) {
 					player.dynStats("str", -player.statusEffectv1(StatusEffects.DwarfRage),"tou", -player.statusEffectv2(StatusEffects.DwarfRage),"spe", -player.statusEffectv2(StatusEffects.DwarfRage), "scale", false);
@@ -3825,13 +3798,6 @@
 				}
 				else player.addStatusValue(StatusEffects.DwarfRage,3,-1);
 			}
-			if (player.hasStatusEffect(StatusEffects.OniRampage)) {
-				if (player.statusEffectv1(StatusEffects.OniRampage) <= 0) {
-					player.removeStatusEffect(StatusEffects.OniRampage);
-					outputText("<b>Your rage wear off.</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.OniRampage,1,-1);
-			}
 			if (player.hasStatusEffect(StatusEffects.Maleficium)) {
 				if (player.statusEffectv1(StatusEffects.Maleficium) <= 0) {
 					player.removeStatusEffect(StatusEffects.Maleficium);
@@ -3839,21 +3805,7 @@
 				}
 				else player.addStatusValue(StatusEffects.Maleficium,1,-1);
 			}
-			//Spell buffs
-			if (player.hasStatusEffect(StatusEffects.ChargeWeapon)) {
-				if (player.statusEffectv2(StatusEffects.ChargeWeapon) <= 0) {
-					player.removeStatusEffect(StatusEffects.ChargeWeapon);
-					outputText("<b>Charged Weapon effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.ChargeWeapon,2,-1);
-			}
-			if (player.hasStatusEffect(StatusEffects.ChargeArmor)) {
-				if (player.statusEffectv2(StatusEffects.ChargeArmor) <= 0) {
-					player.removeStatusEffect(StatusEffects.ChargeArmor);
-					outputText("<b>Charged Armor effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.ChargeArmor,2,-1);
-			}
+
 			if (player.hasStatusEffect(StatusEffects.Might)) {
 				if (player.statusEffectv3(StatusEffects.Might) <= 0) {
 					if (player.hasStatusEffect(StatusEffects.FortressOfIntellect)) player.dynStats("int", -player.statusEffectv1(StatusEffects.Might), "scale", false);
@@ -3865,6 +3817,7 @@
 				}
 				else player.addStatusValue(StatusEffects.Might,3,-1);
 			}
+
 			if (player.hasStatusEffect(StatusEffects.Blink)) {
 				if (player.statusEffectv3(StatusEffects.Blink) <= 0) {
 					player.dynStats("spe", -player.statusEffectv1(StatusEffects.Blink), "scale", false);
@@ -3874,18 +3827,7 @@
 				}
 				else player.addStatusValue(StatusEffects.Blink,3,-1);
 			}
-			//Blizzard
-			if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-				//Remove blizzard if countdown to 0
-				if (player.statusEffectv1(StatusEffects.Blizzard) <= 0) {
-					player.removeStatusEffect(StatusEffects.Blizzard);
-					outputText("<b>Blizzard spell exhausted all of it power and need to be casted again to provide protection from the fire attacks again!</b>\n\n");
-				}
-				else {
-					player.addStatusValue(StatusEffects.Blizzard,1,-1);
-					outputText("<b>Surrounding your blizzard slowly loosing it protective power.</b>\n\n");
-				}
-			}
+
 			//Violet Pupil Transformation
 			if (player.hasStatusEffect(StatusEffects.VioletPupilTransformation)) {
 				if (player.soulforce < 100) {
@@ -3946,14 +3888,6 @@
 				//		outputText("<b>As your soulforce is drained you can feel Violet Pupil Transformation regenerative power spreading in your body.</b>\n\n");
 				//	}
 			}
-			//Everywhere and nowhere
-			if (player.hasStatusEffect(StatusEffects.EverywhereAndNowhere)) {
-				if (player.statusEffectv1(StatusEffects.EverywhereAndNowhere) <= 0) {
-					player.removeStatusEffect(StatusEffects.EverywhereAndNowhere);
-					outputText("<b>Everywhere and nowhere effect ended!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.EverywhereAndNowhere,1,-1);
-			}
 			//Flying
 			if(player.isFlying()) {
 				player.addStatusValue(StatusEffects.Flying,1,-1);
@@ -3961,149 +3895,6 @@
 				else {
 					outputText("<b>You land to tired to keep flying.</b>\n\n");
 					player.removeStatusEffect(StatusEffects.Flying);
-				}
-			}
-			//Ink Spray
-			if (player.hasStatusEffect(StatusEffects.CooldownInkSpray)) {
-				if (player.statusEffectv1(StatusEffects.CooldownInkSpray) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownInkSpray);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownInkSpray,1,-1);
-				}
-			}
-			//Everywhere And Nowhere
-			if (player.hasStatusEffect(StatusEffects.CooldownEveryAndNowhere)) {
-				if (player.statusEffectv1(StatusEffects.CooldownEveryAndNowhere) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownEveryAndNowhere);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownEveryAndNowhere,1,-1);
-				}
-			}
-			//Tail Smack
-			if (player.hasStatusEffect(StatusEffects.CooldownTailSmack)) {
-				if (player.statusEffectv1(StatusEffects.CooldownTailSmack) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownTailSmack);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownTailSmack,1,-1);
-				}
-			}
-			//Stone Claw
-			if (player.hasStatusEffect(StatusEffects.CooldownStoneClaw)) {
-				if (player.statusEffectv1(StatusEffects.CooldownStoneClaw) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownStoneClaw);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownStoneClaw,1,-1);
-				}
-			}
-			//Tail Slam
-			if (player.hasStatusEffect(StatusEffects.CooldownTailSlam)) {
-				if (player.statusEffectv1(StatusEffects.CooldownTailSlam) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownTailSlam);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownTailSlam,1,-1);
-				}
-			}
-			//Wing Buffet
-			if (player.hasStatusEffect(StatusEffects.CooldownWingBuffet)) {
-				if (player.statusEffectv1(StatusEffects.CooldownWingBuffet) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownWingBuffet);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownWingBuffet,1,-1);
-				}
-			}
-			//Kick
-			if (player.hasStatusEffect(StatusEffects.CooldownKick)) {
-				if (player.statusEffectv1(StatusEffects.CooldownKick) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownKick);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownKick,1,-1);
-				}
-			}
-			//Freezing Breath Fenrir
-			if (player.hasStatusEffect(StatusEffects.CooldownFreezingBreath)) {
-				if (player.statusEffectv1(StatusEffects.CooldownFreezingBreath) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownFreezingBreath);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownFreezingBreath,1,-1);
-				}
-			}
-			//Freezing Breath Yeti
-			if (player.hasStatusEffect(StatusEffects.CooldownFreezingBreathYeti)) {
-				if (player.statusEffectv1(StatusEffects.CooldownFreezingBreathYeti) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownFreezingBreathYeti);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownFreezingBreathYeti,1,-1);
-				}
-			}
-			//Phoenix Fire Breath
-			if (player.hasStatusEffect(StatusEffects.CooldownPhoenixFireBreath)) {
-				if (player.statusEffectv1(StatusEffects.CooldownPhoenixFireBreath) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownPhoenixFireBreath);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownPhoenixFireBreath,1,-1);
-				}
-			}
-			//Illusion
-			if (player.hasStatusEffect(StatusEffects.CooldownIllusion)) {
-				if (player.statusEffectv1(StatusEffects.CooldownIllusion) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownIllusion);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownIllusion,1,-1);
-				}
-			}
-			if (player.hasStatusEffect(StatusEffects.Illusion)) {
-				if (player.statusEffectv1(StatusEffects.Illusion) <= 0) {
-					player.removeStatusEffect(StatusEffects.Illusion);
-				}
-				else {
-					player.addStatusValue(StatusEffects.Illusion,1,-1);
-				}
-			}
-			//Terror
-			if (player.hasStatusEffect(StatusEffects.CooldownTerror)) {
-				if (player.statusEffectv1(StatusEffects.CooldownTerror) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownTerror);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownTerror,1,-1);
-				}
-			}
-			//Fascinate
-			if (player.hasStatusEffect(StatusEffects.CooldownFascinate)) {
-				if (player.statusEffectv1(StatusEffects.CooldownFascinate) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownFascinate);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownFascinate,1,-1);
-				}
-			}
-			//Compelling Aria
-			if (player.hasStatusEffect(StatusEffects.CooldownCompellingAria)) {
-				if (player.statusEffectv1(StatusEffects.CooldownCompellingAria) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownCompellingAria);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownCompellingAria,1,-1);
-				}
-			}
-			//Oni Rampage
-			if (player.hasStatusEffect(StatusEffects.CooldownOniRampage)) {
-				if (player.statusEffectv1(StatusEffects.CooldownOniRampage) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownOniRampage);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownOniRampage,1,-1);
 				}
 			}
 			//Elemental Aspect status effects
@@ -4114,111 +3905,12 @@
 				}
 				else player.addStatusValue(StatusEffects.WindWall,2,-1);
 			}
-			if (player.hasStatusEffect(StatusEffects.StoneSkin)) {
-				if (player.statusEffectv2(StatusEffects.StoneSkin) <= 0) {
-					player.removeStatusEffect(StatusEffects.StoneSkin);
-					outputText("<b>Stone Skin effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.StoneSkin,2,-1);
-			}
-			if (player.hasStatusEffect(StatusEffects.BarkSkin)) {
-				if (player.statusEffectv2(StatusEffects.BarkSkin) <= 0) {
-					player.removeStatusEffect(StatusEffects.BarkSkin);
-					outputText("<b>Bark Skin effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.BarkSkin,2,-1);
-			}
-			if (player.hasStatusEffect(StatusEffects.MetalSkin)) {
-				if (player.statusEffectv2(StatusEffects.MetalSkin) <= 0) {
-					player.removeStatusEffect(StatusEffects.MetalSkin);
-					outputText("<b>Metal Skin effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.MetalSkin,2,-1);
-			}
-			//Hurricane Dance
-			if (player.hasStatusEffect(StatusEffects.CooldownHurricaneDance)) {
-				if (player.statusEffectv1(StatusEffects.CooldownHurricaneDance) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownHurricaneDance);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownHurricaneDance,1,-1);
-				}
-			}
-			if (player.hasStatusEffect(StatusEffects.HurricaneDance)) {
-				if (player.statusEffectv1(StatusEffects.HurricaneDance) <= 0) {
-					player.removeStatusEffect(StatusEffects.HurricaneDance);
-					outputText("<b>Hurricane Dance effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.HurricaneDance,1,-1);
-			}
-			//Earth Stance
-			if (player.hasStatusEffect(StatusEffects.CooldownEarthStance)) {
-				if (player.statusEffectv1(StatusEffects.CooldownEarthStance) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownEarthStance);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownEarthStance,1,-1);
-				}
-			}
-			if (player.hasStatusEffect(StatusEffects.EarthStance)) {
-				if (player.statusEffectv1(StatusEffects.EarthStance) <= 0) {
-					player.removeStatusEffect(StatusEffects.EarthStance);
-					outputText("<b>Earth Stance effect wore off!</b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.EarthStance,1,-1);
-			}
-			//Eclipsing shadow
-			if (player.hasStatusEffect(StatusEffects.CooldownEclipsingShadow)) {
-				if (player.statusEffectv1(StatusEffects.CooldownEclipsingShadow) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownEclipsingShadow);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownEclipsingShadow,1,-1);
-				}
-			}
-			//Sonic scream
-			if (player.hasStatusEffect(StatusEffects.CooldownSonicScream)) {
-				if (player.statusEffectv1(StatusEffects.CooldownSonicScream) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownSonicScream);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownSonicScream,1,-1);
-				}
-			}
-			//Tornado Strike
-			if (player.hasStatusEffect(StatusEffects.CooldownTornadoStrike)) {
-				if (player.statusEffectv1(StatusEffects.CooldownTornadoStrike) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownTornadoStrike);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownTornadoStrike,1,-1);
-				}
-			}
-			//Soul Blast
-			if (player.hasStatusEffect(StatusEffects.CooldownSoulBlast)) {
-				if (player.statusEffectv1(StatusEffects.CooldownSoulBlast) <= 0) {
-					player.removeStatusEffect(StatusEffects.CooldownSoulBlast);
-				}
-				else {
-					player.addStatusValue(StatusEffects.CooldownSoulBlast,1,-1);
-				}
-			}
-			//Second Wind Regen
-			if (player.hasStatusEffect(StatusEffects.SecondWindRegen)) {
-				if (player.statusEffectv2(StatusEffects.SecondWindRegen) <= 0) {
-					player.removeStatusEffect(StatusEffects.SecondWindRegen);
-					outputText("<b></b>\n\n");
-				}
-				else player.addStatusValue(StatusEffects.SecondWindRegen,2,-1);
-			}
-			if (player.hasStatusEffect(StatusEffects.BladeDance)) player.removeStatusEffect(StatusEffects.BladeDance);
-			if (player.hasStatusEffect(StatusEffects.ResonanceVolley)) player.removeStatusEffect(StatusEffects.ResonanceVolley);
-			if (player.hasStatusEffect(StatusEffects.Defend)) player.removeStatusEffect(StatusEffects.Defend);
 			regeneration(true);
 			if(player.lust >= player.maxLust()) doNext(endLustLoss);
 			if(player.HP <= 0) doNext(endHpLoss);
 		}
 
+		//todo @Oxdeception move regen functions
 		public function regeneration(combat:Boolean = true):void {
 			var healingPercent:Number = 0;
 			if (combat) {
@@ -4480,6 +4172,7 @@
 			//Flag the game as being "in combat"
 			inCombat = true;
 			monster = monster_;
+			//todo @Oxdeception move into ember
 			if(monster.short == "Ember") {
 				monster.pronoun1 = SceneLib.emberScene.emberMF("he","she");
 				monster.pronoun2 = SceneLib.emberScene.emberMF("him","her");
@@ -4492,6 +4185,8 @@
 			}
 			playerMenu();
 		}
+
+		//todo @Oxdeception move into monster?
 		public function display():void {
 			if (!monster.checkCalled){
 				outputText("<B>/!\\BUG! Monster.checkMonster() is not called! Calling it now...</B>\n");
@@ -4645,6 +4340,8 @@
 				outputText(monster.generateDebugDescription());
 			}
 		}
+
+		//todo @Oxdeception move into monster
 		public function showMonsterLust():void {
 			//Entrapped
 			if(monster.hasStatusEffect(StatusEffects.Constricted)) {
@@ -4855,7 +4552,7 @@
 			return false;
 		}
 
-
+		//TODO @Oxdeception move below combat moves
 		public function ScyllaSqueeze():void {
 			clearOutput();
 			if (monster.plural) {
@@ -5313,6 +5010,7 @@
 			enemyAI();
 		}
 
+		//TODO @Oxdeception move monster specific handling, simplify
 		public function runAway(callHook:Boolean = true):void {
 			if (callHook && monster.onPcRunAttempt != null){
 				monster.onPcRunAttempt();
@@ -5728,6 +5426,18 @@
 
 		public function scalingBonusLibido():Number {
 			return player.scalingBonusLibido();
+		}
+
+		internal function createCombatStatus(host:Creature,stype:StatusEffectType,duration:int,v1:Number=0,v2:Number=0,v3:Number=0,v4:Number=0):CombatStatusEffect{
+			var status:StatusEffectClass = host.createStatusEffect(stype,v1,v2,v3,v4);
+			if(status is CombatStatusEffect) {
+				var cbStatus:CombatStatusEffect = status as CombatStatusEffect;
+				cbStatus.duration = duration;
+				return cbStatus;
+			} else {
+				host.removeStatusEffectInstance(status);
+				throw new Error("Not a Combat Status Effect type");
+			}
 		}
 	}
 }

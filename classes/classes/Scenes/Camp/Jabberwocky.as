@@ -8,6 +8,7 @@ package classes.Scenes.Camp
 	import classes.GlobalFlags.*;
 	import classes.Scenes.NPCs.PatchouliScene;
 	import classes.Scenes.SceneLib;
+	import classes.StatusEffects.CombatStatusEffect;
 	import classes.internals.*;
 	
 	public class Jabberwocky extends Monster
@@ -51,7 +52,7 @@ package classes.Scenes.Camp
 			damage += eBaseIntelligenceDamage();
 			damage += eBaseWisdomDamage();
 			if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-				player.addStatusValue(StatusEffects.Blizzard, 1, -1);
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				damage *= 0.2;
 			}
 			player.takeMagicDamage(damage, true);

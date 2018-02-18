@@ -13,7 +13,8 @@ import classes.Scenes.Dungeons.D3.LivingStatue;
 import classes.Scenes.NPCs.Holli;
 import classes.Scenes.Places.TelAdre.UmasShop;
 import classes.Scenes.SceneLib;
-import classes.StatusEffects.VampireThirstEffect;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.StatusEffects.VampireThirstEffect;
 
 import coc.view.ButtonData;
 import coc.view.ButtonDataList;
@@ -429,7 +430,7 @@ public class MagicSpecials extends BaseCombatContent {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
 		fatigue(150, USEFATG_MAGIC_NOBM);
-		player.createStatusEffect(StatusEffects.CooldownFreezingBreath,10,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownFreezingBreath,10);
 		var damage:Number = int(player.level * (8 + player.wolfScore()) + rand(60));
 		damage = calcGlacialMod(damage);
 		if (monster.hasPerk(PerkLib.EnemyGroupType)) damage *= 5;
@@ -509,7 +510,7 @@ public class MagicSpecials extends BaseCombatContent {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
 		fatigue(50, USEFATG_MAGIC_NOBM);
-		player.createStatusEffect(StatusEffects.CooldownFreezingBreathYeti,10,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownFreezingBreathYeti,10);
 		var damage:Number = 0;
 		if (player.tou >= 21 && player.tou < 41) damage += (player.tou / 2 + rand((player.tou * 3) / 4));
 		if (player.tou >= 41 && player.tou < 61) damage += ((player.tou * 2) / 3 + rand(player.tou));
@@ -624,7 +625,7 @@ public class MagicSpecials extends BaseCombatContent {
 			lustDmgF = Math.round(lustDmgF);
 			monster.teased(lustDmgF);
 			if(!monster.hasPerk(PerkLib.Resolute)) monster.createStatusEffect(StatusEffects.Stunned,4,0,0,0);
-			player.createStatusEffect(StatusEffects.CooldownCompellingAria,10,0,0,0);
+			combat.createCombatStatus(player,StatusEffects.CooldownCompellingAria,10);
 			player.removeStatusEffect(StatusEffects.ChanneledAttack);
 			player.removeStatusEffect(StatusEffects.ChanneledAttackType);
 			outputText("\n\n");
@@ -761,8 +762,9 @@ public class MagicSpecials extends BaseCombatContent {
 		if (player.statusEffectv1(StatusEffects.ChanneledAttack) == 1) {
 			outputText("A terrifying red aura of power shroud your body as you shout a loud thundering war cry and enter a murderous rampage.");
 			var onirampageDuration:Number = 6;
-			player.createStatusEffect(StatusEffects.OniRampage,onirampageDuration,0,0,0);
-			player.createStatusEffect(StatusEffects.CooldownOniRampage,10,0,0,0);
+			var status:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.OniRampage,onirampageDuration,onirampageDuration);
+			status.removeString = "<b>Your rage wears off.</b>\n\n";
+			combat.createCombatStatus(player, StatusEffects.CooldownOniRampage,10,10);
 			player.removeStatusEffect(StatusEffects.ChanneledAttack);
 			player.removeStatusEffect(StatusEffects.ChanneledAttackType);
 			outputText("\n\n");
@@ -782,7 +784,7 @@ public class MagicSpecials extends BaseCombatContent {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
 		fatigue(40, USEFATG_MAGIC_NOBM);
-		player.createStatusEffect(StatusEffects.CooldownPhoenixFireBreath,5,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownPhoenixFireBreath,5);
 		var damage:Number = 0;
 		damage += 50 + rand(20);
 		damage += (player.level * 10);
@@ -848,8 +850,7 @@ public class MagicSpecials extends BaseCombatContent {
 				outputText("You use your flexibility to barely fold your body out of the way!");
 			}
 			else if(player.hasStatusEffect(StatusEffects.Blizzard)) {
-				outputText("  <b>Surrounding you blizzard at the cost of loosing some of it remaining power massively dissipated most of the fireball energy, causing it to hit with far less force!</b>");
-				player.addStatusValue(StatusEffects.Blizzard,1,-1);
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				damage = Math.round(0.2 * damage);
 			}
 			//Determine if blocked!
@@ -905,7 +906,7 @@ public class MagicSpecials extends BaseCombatContent {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
 		fatigue(50, USEFATG_MAGIC_NOBM);
-		player.createStatusEffect(StatusEffects.DragonFireBreathCooldown,0,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.DragonFireBreathCooldown,1);
 		var damage:Number = 0;
 		damage += scalingBonusIntelligence();// * 0.5
 		damage += scalingBonusWisdom();// * 0.5
@@ -976,8 +977,7 @@ public class MagicSpecials extends BaseCombatContent {
 				outputText("You use your flexibility to barely fold your body out of the way!");
 			}
 			else if(player.hasStatusEffect(StatusEffects.Blizzard)) {
-				outputText("  <b>Surrounding you blizzard at the cost of loosing some of it remaining power massively dissipated most of the fireball energy, causing it to hit with far less force!</b>");
-				player.addStatusValue(StatusEffects.Blizzard,1,-1);
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				damage = Math.round(0.2 * damage);
 			}
 			//Determine if blocked!
@@ -1030,7 +1030,7 @@ public class MagicSpecials extends BaseCombatContent {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
 		fatigue(50, USEFATG_MAGIC_NOBM);
-		player.createStatusEffect(StatusEffects.DragonIceBreathCooldown,0,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.DragonIceBreathCooldown,1);
 		var damage:Number = 0;
 		damage += scalingBonusIntelligence();// * 0.5
 		damage += scalingBonusWisdom();// * 0.5
@@ -1120,7 +1120,7 @@ public class MagicSpecials extends BaseCombatContent {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
 		fatigue(50, USEFATG_MAGIC_NOBM);
-		player.createStatusEffect(StatusEffects.DragonLightningBreathCooldown,0,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.DragonLightningBreathCooldown,1);
 		var damage:Number = 0;
 		damage += scalingBonusIntelligence();// * 0.5
 		damage += scalingBonusWisdom();// * 0.5
@@ -1211,7 +1211,7 @@ public class MagicSpecials extends BaseCombatContent {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
 		fatigue(50, USEFATG_MAGIC_NOBM);
-		player.createStatusEffect(StatusEffects.DragonDarknessBreathCooldown,0,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.DragonDarknessBreathCooldown,1);
 		var damage:Number = 0;
 		damage += scalingBonusIntelligence();// * 0.5
 		damage += scalingBonusWisdom();// * 0.5
@@ -1374,8 +1374,7 @@ public class MagicSpecials extends BaseCombatContent {
 				outputText("You use your flexibility to barely fold your body out of the way!");
 			}
 			else if(player.hasStatusEffect(StatusEffects.Blizzard)) {
-				outputText("  <b>Surrounding you blizzard at the cost of loosing some of it remaining power massively dissipated most of the fireball energy, causing it to hit with far less force!</b>");
-				player.addStatusValue(StatusEffects.Blizzard,1,-1);
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				damage = Math.round(0.2 * damage);
 			}
 			else {
@@ -1501,8 +1500,7 @@ public class MagicSpecials extends BaseCombatContent {
 				outputText("You use your flexibility to barely fold your body out of the way!");
 			}
 			else if(player.hasStatusEffect(StatusEffects.Blizzard)) {
-				outputText("  <b>Surrounding you blizzard at the cost of loosing some of it remaining power massively dissipated most of the fireball energy, causing it to hit with far less force!</b>");
-				player.addStatusValue(StatusEffects.Blizzard,1,-1);
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				damage = Math.round(0.2 * damage);
 			}
 			else {
@@ -1686,7 +1684,8 @@ public class MagicSpecials extends BaseCombatContent {
 			outputText("You roar and unleash your savage fury in order to destroy your foe!\n\n");
 		}
 		else outputText("You roar and unleash your savage fury, forgetting about defense in order to destroy your foe!\n\n");
-		player.createStatusEffect(StatusEffects.Berzerking,berzerkDuration,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.Berzerking,berzerkDuration,berzerkDuration);
+//		player.createStatusEffect(StatusEffects.Berzerking,berzerkDuration,0,0,0);
 		enemyAI();
 	}
 
@@ -1699,6 +1698,8 @@ public class MagicSpecials extends BaseCombatContent {
 			outputText("You roar and unleash your lustful fury in order to destroy your foe!\n\n");
 		}
 		else outputText("You roar and unleash your lustful fury, forgetting about defense from any sexual attacks in order to destroy your foe!\n\n");
+		var effect:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.Lustzerking,lustzerkDuration,lustzerkDuration);
+		effect.removeString = "<b>Lustzerker effect wore off!</b>\n\n";
 		player.createStatusEffect(StatusEffects.Lustzerking,lustzerkDuration,0,0,0);
 		enemyAI();
 	}
@@ -1777,8 +1778,9 @@ public class MagicSpecials extends BaseCombatContent {
 		clearOutput();
 		fatigue(30, USEFATG_PHYSICAL);
 		outputText("You smirk as you start to phase in and out of existence. Good luck to whoever going to try and hit you because they will have to try extra hard.\n\n");
-		player.createStatusEffect(StatusEffects.EverywhereAndNowhere,6,0,0,0);
-		player.createStatusEffect(StatusEffects.CooldownEveryAndNowhere,10,0,0,0);
+		var status:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.EverywhereAndNowhere,6);
+		status.removeString = "<b>Everywhere and nowhere effect ended!</b>\n\n";
+		combat.createCombatStatus(player,StatusEffects.CooldownEveryAndNowhere,10);
 		enemyAI();
 	}
 	
@@ -2390,15 +2392,15 @@ public class MagicSpecials extends BaseCombatContent {
 	}
 	public function kitsuneTerror2():void {
 		if (player.tailCount == 9 && player.tailType == Tail.FOX && player.hasPerk(PerkLib.KitsuneThyroidGland)) {
-			player.createStatusEffect(StatusEffects.CooldownTerror, 3, 0, 0, 0);
+			combat.createCombatStatus(player,StatusEffects.CooldownTerror, 3);
 			fatigue(200, USEFATG_MAGIC_NOBM);
 		}
 		else if ((player.tailCount == 9 && player.tailType == Tail.FOX) || player.hasPerk(PerkLib.KitsuneThyroidGland)) {
-			player.createStatusEffect(StatusEffects.CooldownTerror, 6, 0, 0, 0);
+			combat.createCombatStatus(player,StatusEffects.CooldownTerror, 6);
 			fatigue(100, USEFATG_MAGIC_NOBM);
 		}
 		else {
-			player.createStatusEffect(StatusEffects.CooldownTerror, 9, 0, 0, 0);
+			combat.createCombatStatus(player,StatusEffects.CooldownTerror, 9);
 			fatigue(50, USEFATG_MAGIC_NOBM);
 		}
 		//Inflicts fear and reduces enemy SPD.
@@ -2423,15 +2425,15 @@ public class MagicSpecials extends BaseCombatContent {
 	}
 	public function kitsuneIllusion2():void {
 		if (player.tailCount == 9 && player.tailType == Tail.FOX && player.hasPerk(PerkLib.KitsuneThyroidGland)) {
-			player.createStatusEffect(StatusEffects.CooldownIllusion,3,0,0,0);
+			combat.createCombatStatus(player,StatusEffects.CooldownIllusion,3);
 			fatigue(200, USEFATG_MAGIC_NOBM);
 		}
 		else if ((player.tailCount == 9 && player.tailType == Tail.FOX) || player.hasPerk(PerkLib.KitsuneThyroidGland)) {
-			player.createStatusEffect(StatusEffects.CooldownIllusion,6,0,0,0);
+			combat.createCombatStatus(player,StatusEffects.CooldownIllusion,6);
 			fatigue(100, USEFATG_MAGIC_NOBM);
 		}
 		else {
-			player.createStatusEffect(StatusEffects.CooldownIllusion,9,0,0,0);
+			combat.createCombatStatus(player,StatusEffects.CooldownIllusion,9);
 			fatigue(50, USEFATG_MAGIC_NOBM);
 		}
 		if(monster.hasStatusEffect(StatusEffects.Shell)) {
@@ -2441,7 +2443,7 @@ public class MagicSpecials extends BaseCombatContent {
 		}
 		//Decrease enemy speed and increase their susceptibility to lust attacks if already 110% or more
 		outputText("The world begins to twist and distort around you as reality bends to your will, " + monster.a + monster.short + "'s mind blanketed in the thick fog of your illusions.");
-		player.createStatusEffect(StatusEffects.Illusion,3,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.Illusion,3);
 //	//Check for success rate. Maximum 100% with over 90 Intelligence difference between PC and monster. There are diminishing returns. The more you cast, the harder it is to apply another layer of illusion.
 //	if(player.inte/10 + rand(20) > monster.inte/10 + 9 + monster.statusEffectv1(StatusEffects.Illusion) * 2) {
 //	//Reduce speed down to -20. Um, are there many monsters with 110% lust vulnerability?
@@ -2626,7 +2628,7 @@ public class MagicSpecials extends BaseCombatContent {
 			return;
 		}
 		fatigue(30, USEFATG_PHYSICAL);
-		player.createStatusEffect(StatusEffects.CooldownFascinate,4,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownFascinate,4);
 		outputText("You start with first pose to attract " + monster.a + monster.short + " attention.  Then you follow with second and then third pose of your enchanting dance.");
 		var lustDmg:Number = 5;
 		if (player.hasPerk(PerkLib.BlackHeart)) lustDmg += 5;
@@ -2771,7 +2773,7 @@ public class MagicSpecials extends BaseCombatContent {
 		clearOutput();
 		var thirst:VampireThirstEffect = player.statusEffectByType(StatusEffects.VampireThirst) as VampireThirstEffect;
 		thirst.modSatiety(-20);
-		player.createStatusEffect(StatusEffects.CooldownEclipsingShadow,20,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEclipsingShadow,20);
 		outputText("You open your wings wide and call upon the power of your tainted blood a pair of black orbs forming at your fingertips. You shatter them on the ground plunging the area in complete darkness and extinguishing all light. While your opponent will be hard pressed to see anything your ability to echolocate allows you to navigate with perfect clarity.");
 		monster.createStatusEffect(StatusEffects.Blind, 10, 0, 0, 0);
 		enemyAI();
@@ -2782,7 +2784,7 @@ public class MagicSpecials extends BaseCombatContent {
 		clearOutput();
 		var thirst:VampireThirstEffect = player.statusEffectByType(StatusEffects.VampireThirst) as VampireThirstEffect;
 		thirst.modSatiety(-20);
-		player.createStatusEffect(StatusEffects.CooldownSonicScream, 15, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownSonicScream, 15);
 		if(monster.hasStatusEffect(StatusEffects.Shell)) {
 			outputText("As soon as your magic touches the multicolored shell around " + monster.a + monster.short + ", it sizzles and fades to nothing.  Whatever that thing is, it completely blocks your magic!\n\n");
 			enemyAI();
@@ -2807,7 +2809,7 @@ public class MagicSpecials extends BaseCombatContent {
 
 	public function ElementalAspectAir():void {
 		clearOutput();
-		player.createStatusEffect(StatusEffects.CooldownEAspectAir, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectAir, 1);
 		var windwallduration:Number = 0;
 		windwallduration += 1;
 		if (player.inte >= 20) windwallduration += 1;
@@ -2834,7 +2836,7 @@ public class MagicSpecials extends BaseCombatContent {
 
 	public function ElementalAspectEarth():void {
 		clearOutput();
-		player.createStatusEffect(StatusEffects.CooldownEAspectEarth, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectEarth, 1);
 		var stoneskinbonus:Number = 0;
 		stoneskinbonus += player.inte * 0.1;
 		stoneskinbonus += player.wis * 0.1;
@@ -2847,7 +2849,7 @@ public class MagicSpecials extends BaseCombatContent {
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsEarth) >= 5) stoneskinduration += 1;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsEarth) >= 6) stoneskinduration += 2;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsEarth) >= 7) stoneskinduration += 2;
-		player.createStatusEffect(StatusEffects.StoneSkin, stoneskinbonus, stoneskinduration, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.StoneSkin,stoneskinduration,stoneskinbonus).removeString = "<b>Stone Skin effect wore off!</b>\n\n";
 		outputText("Your elemental lifts stone and dirt from the ground, encasing you in a earthen shell stronger than any armor.\n\n");
 		enemyAI();
 	}
@@ -2855,7 +2857,7 @@ public class MagicSpecials extends BaseCombatContent {
 	public function ElementalAspectFire():void {
 		clearOutput();
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
-		player.createStatusEffect(StatusEffects.CooldownEAspectFire, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectFire, 1);
 		var damage:Number = 0;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsFire) >= 2) {
 			if (player.statusEffectv2(StatusEffects.SummonedElementalsFire) >= 3) {
@@ -2916,7 +2918,7 @@ public class MagicSpecials extends BaseCombatContent {
 
 	public function ElementalAspectWater():void {
 		clearOutput();
-		player.createStatusEffect(StatusEffects.CooldownEAspectWater, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectWater, 1);
 		var temp:Number = 0;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsWater) >= 2) {
 			if (player.statusEffectv2(StatusEffects.SummonedElementalsWater) >= 3) {
@@ -2962,7 +2964,7 @@ public class MagicSpecials extends BaseCombatContent {
 	public function ElementalAspectEther():void {
 		clearOutput();
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
-		player.createStatusEffect(StatusEffects.CooldownEAspectEther, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectEther, 1);
 		var damage:Number = 0;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsEther) >= 2) {
 			if (player.statusEffectv2(StatusEffects.SummonedElementalsEther) >= 3) {
@@ -3026,7 +3028,7 @@ public class MagicSpecials extends BaseCombatContent {
 
 	public function ElementalAspectWood():void {
 		clearOutput();
-		player.createStatusEffect(StatusEffects.CooldownEAspectWood, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectWood, 1);
 		var barkskinbonus:Number = 0;
 		barkskinbonus += player.inte * 0.05;
 		barkskinbonus += player.wis * 0.05;
@@ -3039,7 +3041,8 @@ public class MagicSpecials extends BaseCombatContent {
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsWood) >= 5) barkskinduration += 1;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsWood) >= 6) barkskinduration += 2;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsWood) >= 7) barkskinduration += 2;
-		player.createStatusEffect(StatusEffects.BarkSkin, barkskinbonus, barkskinduration, 0, 0);
+		var status:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.BarkSkin,barkskinduration,barkskinbonus);
+		status.removeString = "<b>Bark Skin effect wore off!</b>\n\n";
 		var temp:Number = 0;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsWood) >= 2) {
 			if (player.statusEffectv2(StatusEffects.SummonedElementalsWood) >= 3) {
@@ -3084,7 +3087,7 @@ public class MagicSpecials extends BaseCombatContent {
 
 	public function ElementalAspectMetal():void {
 		clearOutput();
-		player.createStatusEffect(StatusEffects.CooldownEAspectMetal, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectMetal,1);
 		var metalskinbonus:Number = 0;
 		metalskinbonus += player.inte * 0.1;
 		metalskinbonus += player.wis * 0.1;
@@ -3097,7 +3100,8 @@ public class MagicSpecials extends BaseCombatContent {
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsMetal) >= 5) metalskinduration += 1;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsMetal) >= 6) metalskinduration += 2;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsMetal) >= 7) metalskinduration += 2;
-		player.createStatusEffect(StatusEffects.MetalSkin, metalskinbonus, metalskinduration, 0, 0);
+		var status:CombatStatusEffect = combat.createCombatStatus(player,StatusEffects.MetalSkin,metalskinduration,metalskinbonus);
+		status.removeString = "<b>Metal Skin effect wore off!</b>\n\n";
 		outputText("Your elemental encases your body into a layer of flexible yet solid steel. The metal gives strength to your frame, empowering your unarmed strikes.\n\n");
 		enemyAI();
 	}
@@ -3105,7 +3109,7 @@ public class MagicSpecials extends BaseCombatContent {
 	public function ElementalAspectIce():void {
 		clearOutput();
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
-		player.createStatusEffect(StatusEffects.CooldownEAspectIce, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectIce, 1);
 		var damage:Number = 0;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsIce) >= 2) {
 			if (player.statusEffectv2(StatusEffects.SummonedElementalsIce) >= 3) {
@@ -3167,7 +3171,7 @@ public class MagicSpecials extends BaseCombatContent {
 	public function ElementalAspectLightning():void {
 		clearOutput();
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
-		player.createStatusEffect(StatusEffects.CooldownEAspectLightning, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectLightning, 1);
 		var damage:Number = 0;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsLightning) >= 2) {
 			if (player.statusEffectv2(StatusEffects.SummonedElementalsLightning) >= 3) {
@@ -3228,7 +3232,7 @@ public class MagicSpecials extends BaseCombatContent {
 	public function ElementalAspectDarkness():void {
 		clearOutput();
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
-		player.createStatusEffect(StatusEffects.CooldownEAspectDarkness, 0, 0, 0, 0);
+		combat.createCombatStatus(player,StatusEffects.CooldownEAspectDarkness, 1);
 		var damage:Number = 0;
 		if (player.statusEffectv2(StatusEffects.SummonedElementalsDarkness) >= 2) {
 			if (player.statusEffectv2(StatusEffects.SummonedElementalsDarkness) >= 3) {

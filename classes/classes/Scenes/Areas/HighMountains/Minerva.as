@@ -6,7 +6,8 @@ import classes.BodyParts.Hips;
 import classes.BodyParts.Wings;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
-import classes.internals.*;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.*;
 
 public class Minerva extends Monster
 	{
@@ -116,9 +117,9 @@ public class Minerva extends Monster
 			if (player.hasPerk(PerkLib.FireAffinity)) damage *= 0.3;
 			damage = Math.round(damage);
 			if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-				player.addStatusValue(StatusEffects.Blizzard,1,-1);
 				outputText("The siren holds her hand out, flashing you a cunning smirk and snapping her fingers.  Your entire body is engulfed in white-hot flames, searing flesh and burning your [armor].  The sudden flash of heat and fire elicit panic from deep within you, causing you to cry out and roll on the ground to put the fires out.  The burns aren't too severe due to surrounding your blizzard, but you know you can't keep getting hit like that! ");
 				damage *= 0.2;
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 			}
 			else {
 				outputText("The siren holds her hand out, flashing you a cunning smirk and snapping her fingers.  Your entire body is engulfed in white-hot flames, searing flesh and burning your [armor].  The sudden flash of heat and fire elicit panic from deep within you, causing you to cry out and roll on the ground to put the fires out.  The burns aren't too severe, but you know you can't keep getting hit like that! ");

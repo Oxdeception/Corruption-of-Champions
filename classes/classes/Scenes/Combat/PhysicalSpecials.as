@@ -975,8 +975,8 @@ public class PhysicalSpecials extends BaseCombatContent {
 	public function tailSmackAttack():void {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
-		fatigue(40, USEFATG_PHYSICAL);
-		player.createStatusEffect(StatusEffects.CooldownTailSmack,5,0,0,0);
+		fatigue(40, USEFATG_PHYSICAL)
+		combat.createCombatStatus(player,StatusEffects.CooldownTailSmack,5);
 		//miss
 		if((player.hasStatusEffect(StatusEffects.Blind) && rand(2) == 0) || (monster.spe - player.spe > 0 && int(Math.random() * (((monster.spe - player.spe) / 4) + 80)) > 80)) {
 			outputText("  You smash your tail at " + monster.a + monster.short + ", but connect with only empty air.");
@@ -1000,10 +1000,11 @@ public class PhysicalSpecials extends BaseCombatContent {
 		flags[kFLAGS.LAST_ATTACK_TYPE] = 2;
 		clearOutput();
 		fatigue(30, USEFATG_PHYSICAL);
-		if (player.hasPerk(PerkLib.ScyllaInkGlands)) {
-			player.createStatusEffect(StatusEffects.CooldownInkSpray,4,0,0,0);
+		var cooldown:int = 8;
+		if(player.hasPerk(PerkLib.ScyllaInkGlands)){
+			cooldown = 4;
 		}
-		else player.createStatusEffect(StatusEffects.CooldownInkSpray,8,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownInkSpray,cooldown);
 		outputText("You lift");
 		if (player.gender == 1) outputText(" your cock");
 		if (player.gender == 2 || player.gender == 3) outputText(" a few tentacle");
@@ -1127,7 +1128,7 @@ public class PhysicalSpecials extends BaseCombatContent {
 		clearOutput();
 //This is now automatic - newRound arg defaults to true:	menuLoc = 0;
 		fatigue(60, USEFATG_PHYSICAL);
-		player.createStatusEffect(StatusEffects.CooldownStoneClaw,3,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownStoneClaw,3);
 		var damage:Number = 0;
 		//str bonuses
 		damage += player.str;
@@ -1188,7 +1189,7 @@ public class PhysicalSpecials extends BaseCombatContent {
 		clearOutput();
 //This is now automatic - newRound arg defaults to true:	menuLoc = 0;
 		fatigue(30, USEFATG_PHYSICAL);
-		player.createStatusEffect(StatusEffects.CooldownTailSlam,5,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownTailSlam,5);
 		var damage:Number = 0;
 		//str bonuses
 		damage += player.str;
@@ -1255,7 +1256,7 @@ public class PhysicalSpecials extends BaseCombatContent {
 		clearOutput();
 //This is now automatic - newRound arg defaults to true:	menuLoc = 0;
 		fatigue(30, USEFATG_PHYSICAL);
-		player.createStatusEffect(StatusEffects.CooldownWingBuffet,5,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownWingBuffet,5);
 		var damage:Number = 0;
 		damage += player.str/5;
 		damage += player.tou/5;
@@ -1302,7 +1303,7 @@ public class PhysicalSpecials extends BaseCombatContent {
 		clearOutput();
 //This is now automatic - newRound arg defaults to true:	menuLoc = 0;
 		fatigue(60, USEFATG_PHYSICAL);
-		player.createStatusEffect(StatusEffects.CooldownTornadoStrike,8,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownTornadoStrike,8);
 		var damage:Number = 0;
 		//spe bonuses
 		damage += player.spe;
@@ -2480,7 +2481,7 @@ public class PhysicalSpecials extends BaseCombatContent {
 			return;
 		}
 		fatigue(20, USEFATG_PHYSICAL);
-		player.createStatusEffect(StatusEffects.CooldownKick,5,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownKick,5);
 		//Variant start messages!
 		if(player.lowerBody == LowerBody.KANGAROO) {
 			//(tail)
@@ -2645,7 +2646,7 @@ public class PhysicalSpecials extends BaseCombatContent {
 			addButton(0, "Next", combatMenu, false);
 			return;
 		}
-		player.createStatusEffect(StatusEffects.CooldownSideWinder,0,0,0,0);
+		combat.createCombatStatus(player,StatusEffects.CooldownSideWinder,1);
 		outputText("You draw but a single arrow infusing a massive amount of magical energy in the bolt which begin to emit a ");
 		if (player.cor > 50) outputText("red");
 		else if (player.cor < 50) outputText("white");

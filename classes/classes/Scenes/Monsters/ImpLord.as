@@ -7,7 +7,8 @@ import classes.BodyParts.LowerBody;
 import classes.BodyParts.Wings;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
-import classes.internals.*;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.*;
 
 public class ImpLord extends Imp
 	{
@@ -19,12 +20,12 @@ public class ImpLord extends Imp
 			if (player.hasPerk(PerkLib.FromTheFrozenWaste) || player.hasPerk(PerkLib.ColdAffinity)) damage *= 3;
 			if (player.hasPerk(PerkLib.FireAffinity)) damage *= 0.3;
 			if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-			player.addStatusValue(StatusEffects.Blizzard, 1, -1);
-			outputText("The imp mutters something to himself. Before you have time to react the demonic creature's hand is filled with a bright red fire that he hurls at you.  The flames lick at your body leaving a small burn on you torso due to protedction of blizzard, as well as an arousing heat in your groin. ");
-			damage *= 0.2;
+				outputText("The imp mutters something to himself. Before you have time to react the demonic creature's hand is filled with a bright red fire that he hurls at you.  The flames lick at your body leaving a small burn on you torso due to protedction of blizzard, as well as an arousing heat in your groin. ");
+				damage *= 0.2;
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 			}
 			else {
-			outputText("The imp mutters something to himself. Before you have time to react the demonic creature's hand is filled with a bright red fire that he hurls at you.  The flames lick at your body leaving a painful burn on you torso, as well as an arousing heat in your groin. ");
+				outputText("The imp mutters something to himself. Before you have time to react the demonic creature's hand is filled with a bright red fire that he hurls at you.  The flames lick at your body leaving a painful burn on you torso, as well as an arousing heat in your groin. ");
 			}
 			damage = Math.round(damage);
 			player.takeMagicDamage(damage, true);

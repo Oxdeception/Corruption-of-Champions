@@ -9,7 +9,8 @@ import classes.BodyParts.Tail;
 import classes.BodyParts.Wings;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
-import classes.internals.ChainedDrop;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.ChainedDrop;
 
 public class Phoenix extends Monster
 	{
@@ -47,9 +48,9 @@ public class Phoenix extends Monster
 					if (player.hasPerk(PerkLib.FromTheFrozenWaste) || player.hasPerk(PerkLib.ColdAffinity)) damage *= 3;
 					if (player.hasPerk(PerkLib.FireAffinity)) damage *= 0.3;
 					if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-						player.addStatusValue(StatusEffects.Blizzard, 1, -1);
 						outputText("As she zooms over you a great gout of flame erupts from the phoenix’s mouth! You dive out of the way, but all too late. The wall of fire rolls over covering you blizzard you as you leap through it, the brief contact with the inferno searing both you and your [armor] slightly due to still swirling around you ice shards. ");
 						damage *= 0.2;
+						(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 					}
 					else {
 						outputText("As she zooms over you a great gout of flame erupts from the phoenix’s mouth! You dive out of the way, but all too late. The wall of fire rolls over you as you leap through it, the brief contact with the inferno searing both you and your [armor] badly. ");

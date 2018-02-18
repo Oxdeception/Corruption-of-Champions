@@ -7,7 +7,8 @@ import classes.BodyParts.Horns;
 import classes.BodyParts.Tail;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
-import classes.internals.ChainedDrop;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.ChainedDrop;
 
 public class Ember extends Monster
 	{
@@ -70,9 +71,9 @@ public class Ember extends Monster
 				else {
 					var damage2:Number = 0;
 					if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-						player.addStatusValue(StatusEffects.Blizzard, 1, -1);
 						outputText("  The pain as the deadly combination washes over you is indescribable.  Despite it wasn't pure fire attack surrounding you blizzard still managed to block prt of it power and you endure it somehow making even Ember looks amazed to see you still standing. ");
 						damage2 += 140 + (this.inte * 1.5) + rand(140);
+						(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 					}
 					else {
 						outputText("  The pain as the deadly combination washes over you is indescribable.  It's a miracle that you endure it, and even Ember looks amazed to see you still standing. ");

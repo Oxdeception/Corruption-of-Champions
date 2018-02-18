@@ -9,7 +9,8 @@ import classes.BodyParts.Tail;
 import classes.BodyParts.Wings;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
-import classes.internals.ChainedDrop;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.ChainedDrop;
 
 public class Kiha extends Monster
 	{
@@ -38,7 +39,7 @@ public class Kiha extends Monster
 				if (flags[kFLAGS.KIHA_LVL_UP] >= 1) damage *= (1 + (flags[kFLAGS.KIHA_LVL_UP] * 0.1));
 				damage = Math.round(damage);
 				if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-					player.addStatusValue(StatusEffects.Blizzard, 1, -1);
+					(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 					damage *= 0.2;
 					damage = Math.round(damage);
 				}

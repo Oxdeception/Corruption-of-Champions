@@ -5,7 +5,8 @@ import classes.BodyParts.Butt;
 import classes.BodyParts.Hips;
 import classes.GlobalFlags.*;
 import classes.Scenes.SceneLib;
-import classes.internals.*;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.*;
 
 public class GoblinElder extends Goblin
 	{
@@ -62,9 +63,9 @@ public class GoblinElder extends Goblin
 				if (player.hasPerk(PerkLib.FromTheFrozenWaste) || player.hasPerk(PerkLib.ColdAffinity)) damage *= 3;
 				if (player.hasPerk(PerkLib.FireAffinity)) damage *= 0.3;
 				if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-				player.addStatusValue(StatusEffects.Blizzard, 1, -1);
-				outputText("Luckly protective ice maelstorm still surrounding you lessening amount of damage.  ");
-				damage *= 0.2;
+					outputText("Luckly protective ice maelstorm still surrounding you lessening amount of damage.  ");
+					damage *= 0.2;
+					(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 				}
 				if (player.isGoo()) {
 					damage *= 1.5;

@@ -8,7 +8,8 @@ import classes.BodyParts.LowerBody;
 import classes.BodyParts.Tail;
 import classes.BodyParts.Wings;
 import classes.Scenes.SceneLib;
-import classes.internals.WeightedDrop;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.WeightedDrop;
 
 public class PhoenixPlatoon extends Monster
 	{
@@ -28,12 +29,12 @@ public class PhoenixPlatoon extends Monster
 			if (player.hasPerk(PerkLib.FromTheFrozenWaste) || player.hasPerk(PerkLib.ColdAffinity)) damage *= 3;
 			if (player.hasPerk(PerkLib.FireAffinity)) damage *= 0.3;
 			if (player.hasStatusEffect(StatusEffects.Blizzard)) {
-			player.addStatusValue(StatusEffects.Blizzard, 1, -1);
-			outputText("Suddenly, the shield wall parts, revealing a single member of the platoon, a particularly muscular girl with a raging erection.  Before you can consider what's going on, she rears back and huffs at you.  To your horror, a great gout of fire erupts from her mouth, rolling towards you.  You dive, but are still caught partially in the inferno.  Luckly blizzard still surrounding you lowering amount of fire that pass throu it.");
-			damage *= 0.2;
+				outputText("Suddenly, the shield wall parts, revealing a single member of the platoon, a particularly muscular girl with a raging erection.  Before you can consider what's going on, she rears back and huffs at you.  To your horror, a great gout of fire erupts from her mouth, rolling towards you.  You dive, but are still caught partially in the inferno.  Luckly blizzard still surrounding you lowering amount of fire that pass throu it.");
+				damage *= 0.2;
+				(player.statusEffectByType(StatusEffects.Blizzard) as CombatStatusEffect).durationTick(true);
 			}
 			else {
-			outputText("Suddenly, the shield wall parts, revealing a single member of the platoon, a particularly muscular girl with a raging erection.  Before you can consider what's going on, she rears back and huffs at you.  To your horror, a great gout of fire erupts from her mouth, rolling towards you.  You dive, but are still caught partially in the inferno.");
+				outputText("Suddenly, the shield wall parts, revealing a single member of the platoon, a particularly muscular girl with a raging erection.  Before you can consider what's going on, she rears back and huffs at you.  To your horror, a great gout of fire erupts from her mouth, rolling towards you.  You dive, but are still caught partially in the inferno.");
 			}
 			damage = Math.round(damage);
 			damage = player.takeMagicDamage(damage, true);
