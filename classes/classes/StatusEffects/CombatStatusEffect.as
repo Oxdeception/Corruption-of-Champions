@@ -13,6 +13,7 @@ public class CombatStatusEffect extends StatusEffectClass
 	private var _updateString:String;
 	private var _removeString:String;
 	private var _manualString:String;
+	private var _effects:Vector.<CombatBaseEffect> = new Vector.<CombatBaseEffect>();
 
 	public function CombatStatusEffect(stype:StatusEffectType)
 	{
@@ -38,12 +39,16 @@ public class CombatStatusEffect extends StatusEffectClass
 				EngineCore.outputText(_removeString);
 			}
 			remove();
+			return;
 		}
-		else if(manual && _manualString){
+		if(manual && _manualString){
 			EngineCore.outputText(_manualString);
 		}
 		else if(_updateString){
 			EngineCore.outputText(_updateString);
+		}
+		for each (var effect:CombatBaseEffect in _effects){
+			effect.apply(host);
 		}
 		if(_duration < 0) {return;}
 		_duration--;
@@ -52,6 +57,10 @@ public class CombatStatusEffect extends StatusEffectClass
 	public function set duration(value:int):void
 	{
 		_duration = value;
+	}
+
+	public function increase(value:int):void{
+		_duration += value;
 	}
 
 	/**
@@ -75,6 +84,27 @@ public class CombatStatusEffect extends StatusEffectClass
 	public function set manualString(value:String):void
 	{
 		_manualString = value;
+	}
+
+	public function set effects(value:Vector.<CombatBaseEffect>):void
+	{
+		_effects = value;
+	}
+
+	public function addEffect(value:CombatBaseEffect):void
+	{
+		if(value in _effects){
+			_effects[_effects.indexOf(value)].increase(value.current);
+		} else {
+			_effects.push(value);
+		}
+	}
+
+	override public function onRemove():void{
+		for each (var effect:CombatBaseEffect in _effects){
+			effect.remove(host);
+		}
+		super.onRemove();
 	}
 }
 }

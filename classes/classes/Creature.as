@@ -4190,5 +4190,95 @@ package classes
 			if (modssc < 0.1) modssc = 0.1;
 			return modssc;
 		}
+
+		private var _silenced:Boolean = false;
+		private var _atrophied:Boolean = false;
+		private var _crippled:Boolean = false;
+		private var _unfocused:Boolean = false;
+		private var _prudish:Boolean = false;
+		private var _cornered:Boolean = false;
+		private var _clumsy:Boolean = false;
+
+		public function get silenced():Boolean
+		{
+			return _silenced;
+		}
+
+		public function get atrophied():Boolean
+		{
+			return _atrophied;
+		}
+
+		public function get crippled():Boolean
+		{
+			return _crippled;
+		}
+
+		public function get unfocused():Boolean
+		{
+			return _unfocused;
+		}
+
+		public function get prudish():Boolean
+		{
+			return _prudish;
+		}
+
+		public function get cornered():Boolean
+		{
+			return _cornered;
+		}
+
+		public function get clumsy():Boolean
+		{
+			return _clumsy;
+		}
+
+		public function silence():void
+		{
+			_silenced = true;
+		}
+
+		public function atrophy():void
+		{
+			_atrophied = true;
+		}
+
+		public function cripple():void
+		{
+			_crippled = true;
+		}
+
+		public function unfocus():void
+		{
+			_unfocused = true;
+		}
+
+		public function prudify():void
+		{
+			_prudish = true;
+		}
+
+		public function corner():void
+		{
+			_cornered = true;
+		}
+
+		public function clumsify():void
+		{
+			_clumsy = true;
+		}
+		public function onCombatRound():void {
+			_atrophied = false;
+			_clumsy = false;
+			_cornered = false;
+			_crippled = false;
+			_prudish = false;
+			_unfocused = false;
+			_silenced = false;
+			for each(var status:StatusEffectClass in statusEffects){
+				status.onCombatRound();
+			}
+		}
 	}
 }

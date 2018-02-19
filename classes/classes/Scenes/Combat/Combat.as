@@ -3241,9 +3241,7 @@
 			//Reset menuloc
 			//This is now automatic - newRound arg defaults to true:	menuLoc = 0;
 			hideUpDown();
-			for each (var status:StatusEffectClass in player.statusEffects){
-				status.onCombatRound();
-			}
+			player.onCombatRound();
 			if (player.hasStatusEffect(StatusEffects.MinotaurKingMusk))
 			{
 				dynStats("lus+", 3);
@@ -3481,20 +3479,7 @@
 					outputText("<b>You gasp and wince in pain, feeling fresh blood pump from your wounds. (<font color=\"#800000\">" + bleed + "</font>)</b>\n\n");
 				}
 			}
-			if(player.hasStatusEffect(StatusEffects.Hemorrhage)) {
-				player.addStatusValue(StatusEffects.Hemorrhage,1,-1);
-				if(player.statusEffectv1(StatusEffects.Hemorrhage) <= 0) {
-					player.removeStatusEffect(StatusEffects.Hemorrhage);
-					outputText("<b>You sigh with relief; your hemorrhage has slowed considerably.</b>\n\n");
-				}
-				//Hemorrhage effect:
-				else {
-					var hemorrhage:Number = 0;
-					hemorrhage += player.maxHP() * player.statusEffectv2(StatusEffects.Hemorrhage);
-					hemorrhage = player.takePhysDamage(hemorrhage);
-					outputText("<b>You gasp and wince in pain, feeling fresh blood pump from your wounds. (<font color=\"#800000\">" + hemorrhage + "</font>)</b>\n\n");
-				}
-			}
+
 			if (player.hasStatusEffect(StatusEffects.Disarmed)) {
 				player.addStatusValue(StatusEffects.Disarmed,1,-1);
 				if (player.statusEffectv1(StatusEffects.Hemorrhage) <= 0) {

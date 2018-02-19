@@ -8,6 +8,7 @@ package classes.Scenes.Camp
 	import classes.GlobalFlags.*;
 	import classes.Scenes.NPCs.PatchouliScene;
 	import classes.Scenes.SceneLib;
+	import classes.StatusEffects.BaseEffects.DamageOverTime;
 	import classes.StatusEffects.CombatStatusEffect;
 	import classes.internals.*;
 	
@@ -38,7 +39,11 @@ package classes.Scenes.Camp
 			damage += eBaseDamage();
 			player.takePhysDamage(damage, true);
 			if (player.hasStatusEffect(StatusEffects.Hemorrhage)) player.removeStatusEffect(StatusEffects.Hemorrhage);
-			player.createStatusEffect(StatusEffects.Hemorrhage,10,0.1,0,0);
+			var status:CombatStatusEffect = player.createStatusEffect(StatusEffects.Hemorrhage,10,0.1,0,0) as CombatStatusEffect;
+			status.duration = 10;
+			status.addEffect(new DamageOverTime(DamageOverTime.NONE,player.maxHP() * 0.1,10));
+			status.removeString = "<b>You sigh with relief; your hemorrhage has slowed considerably.</b>\n\n";
+			status.updateString = "<b>You gasp and wince in pain, feeling fresh blood pump from your wounds. </b>";
 		}
 		
 		private function TakeFlight():void {

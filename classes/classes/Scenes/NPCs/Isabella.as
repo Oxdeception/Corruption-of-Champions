@@ -6,8 +6,10 @@ import classes.BodyParts.Hips;
 import classes.BodyParts.Tail;
 import classes.GlobalFlags.kFLAGS;
 import classes.Scenes.SceneLib;
+	import classes.StatusEffects.BaseEffects.FuncEffect;
+	import classes.StatusEffects.CombatStatusEffect;
 
-public class Isabella extends Monster
+	public class Isabella extends Monster
 	{
 
 		//IZZY AI:
@@ -138,7 +140,9 @@ public class Isabella extends Monster
 					outputText("You try your best to stop the onrushing fist, but it hits you square in the throat, nearly collapsing your windpipe entirely.  Gasping and sputtering, you try to breathe, and while it's difficult, you manage enough to prevent suffocation. <b>It will be impossible to focus to cast a spell in this state!</b> ");
 					damage = player.takePhysDamage(damage, true);
 					outputText("\n");
-					player.createStatusEffect(StatusEffects.ThroatPunch,2,0,0,0);
+					var status:CombatStatusEffect = player.createStatusEffect(StatusEffects.ThroatPunch,2,0,0,0) as CombatStatusEffect;
+					status.addEffect(new FuncEffect(player.silence));
+					status.duration = 2;
 				}
 			}
 		}

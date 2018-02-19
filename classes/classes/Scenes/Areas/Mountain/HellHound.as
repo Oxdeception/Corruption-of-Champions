@@ -1,16 +1,15 @@
 ﻿package classes.Scenes.Areas.Mountain
 {
-import classes.*;
-import classes.BodyParts.Butt;
-import classes.BodyParts.Hips;
-import classes.BodyParts.LowerBody;
-import classes.BodyParts.Tail;
-import classes.Scenes.SceneLib;
+	import classes.*;
+	import classes.BodyParts.Butt;
+	import classes.BodyParts.Hips;
+	import classes.BodyParts.LowerBody;
+	import classes.BodyParts.Tail;
+	import classes.Scenes.SceneLib;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.WeightedDrop;
 
-import classes.StatusEffects.CombatStatusEffect;
-	importclasses.internals.*;
-
-public class HellHound extends Monster
+	public class HellHound extends Monster
 	{
 		protected function hellhoundFire():void {
 			//Blind dodge change

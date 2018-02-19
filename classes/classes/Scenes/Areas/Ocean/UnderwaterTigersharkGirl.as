@@ -7,8 +7,11 @@ package classes.Scenes.Areas.Ocean
 import classes.*;
 import classes.BodyParts.Butt;
 import classes.BodyParts.Hips;
-import classes.Scenes.SceneLib;
-import classes.internals.*;
+	import classes.Scenes.Combat.Combat;
+	import classes.Scenes.SceneLib;
+	import classes.StatusEffects.BaseEffects.DamageOverTime;
+	import classes.StatusEffects.CombatStatusEffect;
+	import classes.internals.*;
 
 public class UnderwaterTigersharkGirl extends Monster
 	{
@@ -33,8 +36,17 @@ public class UnderwaterTigersharkGirl extends Monster
 			var damage:Number = 0;
 			damage += eBaseDamage();
 			player.takePhysDamage(damage, true);
-			if (player.hasStatusEffect(StatusEffects.Hemorrhage)) player.addStatusValue(StatusEffects.Hemorrhage, 1, 1);
-			else player.createStatusEffect(StatusEffects.Hemorrhage,3,0.1,0,0);
+			var status:CombatStatusEffect;
+			if (player.hasStatusEffect(StatusEffects.Hemorrhage)){
+				status = player.statusEffectByType(StatusEffects.Hemorrhage) as CombatStatusEffect;
+				status.increase(1);
+			} else {
+				status = player.createStatusEffect(StatusEffects.Hemorrhage,3,0.05,0,0) as CombatStatusEffect;
+				status.duration = 3;
+				status.addEffect(new DamageOverTime(DamageOverTime.NONE,player.maxHP() * 0.1,10));
+				status.removeString = "<b>You sigh with relief; your hemorrhage has slowed considerably.</b>\n\n";
+				status.updateString = "<b>You gasp and wince in pain, feeling fresh blood pump from your wounds. </b>";
+			}
 		}
 		
 		override public function defeated(hpVictory:Boolean):void
