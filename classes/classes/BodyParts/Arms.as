@@ -39,7 +39,7 @@ public class Arms extends BodyPart {
 		CAT,DEVIL,DRAGON,FOX,GARGOYLE,LION,LIZARD,RAIJU,RED_PANDA,SALAMANDER,WOLF
 	];
 	public function haveNaturalClaws():Boolean {
-		return (type in _hasNaturalClaws);
+		return (_hasNaturalClaws.indexOf(type) != -1);
 	}
 }
 }
